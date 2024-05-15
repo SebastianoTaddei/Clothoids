@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools", "cmake", "swig"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Clothoids"
+version = "0.1"
+authors = [{name = "Enrico Bertolazzi"}]
+description = "G1 and G2 fitting with clothoids, spline of clothoids, circle arc and biarc."
+readme = "bindings/README.md"
