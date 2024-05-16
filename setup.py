@@ -82,7 +82,7 @@ class build_with_rake(build_ext):
 
     def clone_repo(self):
         # Download the latest release from github
-        url = "https://github.com/ebertolazzi/Clothoids/archive/refs/tags/2.0.13.zip"
+        url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14-dev/Clothoids.zip"
         filename = os.path.join(self.dirname, "Clothoids.zip")
         print(f"Downloading {url} to {filename}")
         urlretrieve(url, filename)
@@ -92,7 +92,7 @@ class build_with_rake(build_ext):
             zip_ref.extractall(self.dirname)
 
     def build_rake(self, ext):
-        os.chdir(os.path.join(self.dirname, "Clothoids-2.0.13"))
+        os.chdir(os.path.join(self.dirname, "Clothoids"))
         self.spawn(["rake"])
         os.chdir(self.dirname)
 
@@ -100,14 +100,14 @@ class build_with_rake(build_ext):
         # Define the include directories
         include_dirs = [
             self.dirname,
-            os.path.join(self.dirname, "Clothoids-2.0.13", "lib", "include"),
-            os.path.join(self.dirname, "Clothoids-2.0.13", "lib3rd", "include"),
+            os.path.join(self.dirname, "Clothoids", "lib", "include"),
+            os.path.join(self.dirname, "Clothoids", "lib3rd", "include"),
         ]
 
         # Define the library directories
         library_dirs = [
-            os.path.join(self.dirname, "Clothoids-2.0.13", "lib", "lib"),
-            os.path.join(self.dirname, "Clothoids-2.0.13", "lib3rd", "lib"),
+            os.path.join(self.dirname, "Clothoids", "lib", "lib"),
+            os.path.join(self.dirname, "Clothoids", "lib3rd", "lib"),
         ]
 
         # Define the libraries
