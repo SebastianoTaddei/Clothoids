@@ -84,12 +84,13 @@ class build_with_rake(build_ext):
         # Download the latest release from github
         url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14/Clothoids.zip"
         filename = os.path.join(self.dirname, "Clothoids.zip")
+        unzipdirname = os.path.join(self.dirname, "Clothoids")
         print(f"Downloading {url} to {filename}")
         urlretrieve(url, filename)
 
         # Unzip the file
         with zipfile.ZipFile(filename, "r") as zip_ref:
-            zip_ref.extractall(self.dirname)
+            zip_ref.extractall(unzipdirname)
 
     def build_rake(self, ext):
         os.chdir(os.path.join(self.dirname, "Clothoids"))
