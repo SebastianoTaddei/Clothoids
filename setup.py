@@ -82,7 +82,7 @@ class build_with_rake(build_ext):
 
     def clone_repo(self):
         # Download the latest release from github
-        url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14-dev/Clothoids.zip"
+        url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14/Clothoids.zip"
         filename = os.path.join(self.dirname, "Clothoids.zip")
         print(f"Downloading {url} to {filename}")
         urlretrieve(url, filename)
@@ -123,7 +123,7 @@ class build_with_rake(build_ext):
                 root = os.path.splitext(filename)[0]
 
                 if root.startswith(prefix):
-                    root = root[len(prefix) :]
+                    root = root[len(prefix):]
 
                 library_names.append(root)
 
