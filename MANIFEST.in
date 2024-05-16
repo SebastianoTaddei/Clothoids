@@ -1,2 +1,2 @@
-include bindings/clothoids_interface.hh
-include bindings/Clothoids.i
+include src_py/clothoids_interface.hh
+include src_py/Clothoids.i

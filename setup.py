@@ -15,7 +15,7 @@ import zipfile
 
 clothoids_module = Extension(
     "_Clothoids",
-    sources=[os.path.join("bindings", "Clothoids.i")],
+    sources=[os.path.join("src_py", "Clothoids.i")],
     include_dirs=[],
     library_dirs=[],
     libraries=[],
