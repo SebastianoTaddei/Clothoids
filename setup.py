@@ -136,6 +136,7 @@ class build_with_rake(build_ext):
 setup(
     ext_modules=[clothoids_module],
     py_modules=["Clothoids"],
+    package_dir={"": "src_py"},
     cmdclass={
         "build_ext": build_with_rake,
     },
