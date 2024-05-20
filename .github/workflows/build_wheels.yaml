@@ -16,6 +16,16 @@ jobs:
       # Used to host cibuildwheel
       - uses: actions/setup-python@v5
 
+      - uses: ruby/setup-ruby@v1
+
+      - name: Setup Ruby
+        run: |
+            gem install colorize
+            ruby setup.rb
+
+      - name: Compile Clothoids
+        run: rake
+
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.18.0
 

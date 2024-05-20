@@ -13,12 +13,44 @@ from setuptools.command.build_ext import build_ext
 from urllib.request import urlretrieve
 import zipfile
 
+dirname = os.path.dirname(os.path.abspath(__file__))
+
+# Define the include directories
+include_dirs = [
+    dirname,
+    os.path.join(dirname, "lib", "include"),
+    os.path.join(dirname, "lib3rd", "include"),
+]
+
+# Define the library directories
+library_dirs = [
+    os.path.join(dirname, "lib", "lib"),
+    os.path.join(dirname, "lib3rd", "lib"),
+]
+
+# Define the libraries
+library_names = []
+prefix = "lib"
+for library_dir in library_dirs:
+    # Get the filenames in the library directory
+    filenames = os.listdir(library_dir)
+
+    # For each filename, remove the prefix and suffix
+    for filename in filenames:
+        # Remove the file extension
+        root = os.path.splitext(filename)[0]
+
+        if root.startswith(prefix):
+            root = root[len(prefix) :]
+
+        library_names.append(root)
+
 clothoids_module = Extension(
     "_Clothoids",
     sources=[os.path.join("src_py", "Clothoids.i")],
-    include_dirs=[],
-    library_dirs=[],
-    libraries=[],
+    include_dirs=[include_dirs],
+    library_dirs=[library_dirs],
+    libraries=[library_names],
     swig_opts=["-c++"],
     extra_compile_args=["-std=c++11"],
 )
@@ -60,84 +92,84 @@ clothoids_module = Extension(
 #         os.chdir(str(cwd))
 
 
-class build_with_rake(build_ext):
+# class build_with_rake(build_ext):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
 
-        # Get the path to this file
-        self.dirname = os.path.dirname(os.path.abspath(__file__))
+#         # Get the path to this file
+#         self.dirname = os.path.dirname(os.path.abspath(__file__))
 
-    def run(self):
-        # Clone the repository
-        print("Cloning the Clothoids repository...")
-        self.clone_repo()
+#     def run(self):
+#         # Clone the repository
+#         print("Cloning the Clothoids repository...")
+#         self.clone_repo()
 
-        for ext in self.extensions:
-            print("Building the Clothoids library...")
-            self.build_rake(ext)
-            self.setup_ext(ext)
+#         for ext in self.extensions:
+#             print("Building the Clothoids library...")
+#             self.build_rake(ext)
+#             self.setup_ext(ext)
 
-        super().run()
+#         super().run()
 
-    def clone_repo(self):
-        # Download the latest release from github
-        url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14/Clothoids.zip"
-        filename = os.path.join(self.dirname, "Clothoids.zip")
-        unzipdirname = os.path.join(self.dirname, "Clothoids")
-        print(f"Downloading {url} to {filename}")
-        urlretrieve(url, filename)
+#     def clone_repo(self):
+#         # Download the latest release from github
+#         url = "https://github.com/SebastianoTaddei/Clothoids/releases/download/2.0.14/Clothoids.zip"
+#         filename = os.path.join(self.dirname, "Clothoids.zip")
+#         unzipdirname = os.path.join(self.dirname, "Clothoids")
+#         print(f"Downloading {url} to {filename}")
+#         urlretrieve(url, filename)
 
-        # Unzip the file
-        with zipfile.ZipFile(filename, "r") as zip_ref:
-            zip_ref.extractall(unzipdirname)
+#         # Unzip the file
+#         with zipfile.ZipFile(filename, "r") as zip_ref:
+#             zip_ref.extractall(unzipdirname)
 
-    def build_rake(self, ext):
-        os.chdir(os.path.join(self.dirname, "Clothoids"))
-        self.spawn(["rake"])
-        os.chdir(self.dirname)
+#     def build_rake(self, ext):
+#         os.chdir(os.path.join(self.dirname, "Clothoids"))
+#         self.spawn(["rake"])
+#         os.chdir(self.dirname)
 
-    def setup_ext(self, ext):
-        # Define the include directories
-        include_dirs = [
-            self.dirname,
-            os.path.join(self.dirname, "Clothoids", "lib", "include"),
-            os.path.join(self.dirname, "Clothoids", "lib3rd", "include"),
-        ]
+#     def setup_ext(self, ext):
+#         # Define the include directories
+#         include_dirs = [
+#             self.dirname,
+#             os.path.join(self.dirname, "Clothoids", "lib", "include"),
+#             os.path.join(self.dirname, "Clothoids", "lib3rd", "include"),
+#         ]
 
-        # Define the library directories
-        library_dirs = [
-            os.path.join(self.dirname, "Clothoids", "lib", "lib"),
-            os.path.join(self.dirname, "Clothoids", "lib3rd", "lib"),
-        ]
+#         # Define the library directories
+#         library_dirs = [
+#             os.path.join(self.dirname, "Clothoids", "lib", "lib"),
+#             os.path.join(self.dirname, "Clothoids", "lib3rd", "lib"),
+#         ]
 
-        # Define the libraries
-        library_names = []
-        prefix = "lib"
-        for library_dir in library_dirs:
-            # Get the filenames in the library directory
-            filenames = os.listdir(library_dir)
+#         # Define the libraries
+#         library_names = []
+#         prefix = "lib"
+#         for library_dir in library_dirs:
+#             # Get the filenames in the library directory
+#             filenames = os.listdir(library_dir)
 
-            # For each filename, remove the prefix and suffix
-            for filename in filenames:
-                # Remove the file extension
-                root = os.path.splitext(filename)[0]
+#             # For each filename, remove the prefix and suffix
+#             for filename in filenames:
+#                 # Remove the file extension
+#                 root = os.path.splitext(filename)[0]
 
-                if root.startswith(prefix):
-                    root = root[len(prefix):]
+#                 if root.startswith(prefix):
+#                     root = root[len(prefix) :]
 
-                library_names.append(root)
+#                 library_names.append(root)
 
-        ext.include_dirs = include_dirs
-        ext.library_dirs = library_dirs
-        ext.libraries = library_names
+#         ext.include_dirs = include_dirs
+#         ext.library_dirs = library_dirs
+#         ext.libraries = library_names
 
 
 setup(
     ext_modules=[clothoids_module],
     py_modules=["Clothoids"],
     package_dir={"": "src_py"},
-    cmdclass={
-        "build_ext": build_with_rake,
-    },
+    # cmdclass={
+    #     "build_ext": build_with_rake,
+    # },
 )
