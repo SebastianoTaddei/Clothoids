@@ -15,6 +15,14 @@ jobs:
 
       # Used to host cibuildwheel
       - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Get CMake with Ninja
+        uses: lukka/get-cmake@latest
+        with:
+            cmakeVersion: latestrc
+            ninjaVersion: latest
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -35,9 +43,8 @@ jobs:
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
-        # to supply options, put them in 'env', like:
-        # env:
-        #   CIBW_SOME_OPTION: value
+        env:
+            CIBW_BUILD: cp38-*
 
       - uses: actions/upload-artifact@v4
         with:
