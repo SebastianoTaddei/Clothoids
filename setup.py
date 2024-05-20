@@ -48,9 +48,9 @@ for library_dir in library_dirs:
 clothoids_module = Extension(
     "_Clothoids",
     sources=[os.path.join("src_py", "Clothoids.i")],
-    include_dirs=[include_dirs],
-    library_dirs=[library_dirs],
-    libraries=[library_names],
+    include_dirs=include_dirs,
+    library_dirs=library_dirs,
+    libraries=library_names,
     swig_opts=["-c++"],
     extra_compile_args=["-std=c++11"],
 )
