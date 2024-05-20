@@ -24,6 +24,7 @@ jobs:
       - name: Setup Ruby
         run: |
             gem install colorize
+            gem install zip
             ruby setup.rb
 
       - name: Compile Clothoids
