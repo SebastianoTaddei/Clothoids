@@ -4,11 +4,8 @@ on: [push, pull_request]
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-13, macos-14] # windows-latest - rake not working on windows
+    name: Build wheels on ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -17,12 +14,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
-      - name: Get CMake with Ninja
-        uses: lukka/get-cmake@latest
-        with:
-            cmakeVersion: latestrc
-            ninjaVersion: latest
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -35,19 +26,22 @@ jobs:
             gem install zip
             ruby setup.rb
 
-      - name: Compile Clothoids
-        run: rake
-
       - name: Install cibuildwheel
         run: python -m pip install cibuildwheel==2.18.0
 
       - name: Build wheels
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-            CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+            CIBW_BUILD: cp311-*
             CIBW_ARCHS: native
+            CIBW_BEFORE_ALL_LINUX: >
+                yum install -y ruby-2.6 &&
+                gem install colorize &&
+                gem install zip &&
+                rake clean &&
+                rake
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-ubuntu-latest
           path: ./wheelhouse/*.whl
