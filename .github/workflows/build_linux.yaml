@@ -40,6 +40,7 @@ jobs:
                 source /opt/rh/rh-ruby26/enable &&
                 gem install colorize &&
                 gem install zip &&
+                gem install rake &&
                 rake clean &&
                 rake
 
