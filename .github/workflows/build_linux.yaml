@@ -35,8 +35,8 @@ jobs:
             CIBW_BUILD: cp311-*
             CIBW_ARCHS: native
             CIBW_BEFORE_ALL_LINUX: >
+                pip install ninja &&
                 yum install -y centos-release-scl &&
-                yum install -y ninja &&
                 yum install -y rh-ruby26 &&
                 source /opt/rh/rh-ruby26/enable &&
                 gem install colorize &&
