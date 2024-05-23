@@ -91,6 +91,27 @@ jobs:
         steps:
         - uses: actions/checkout@v4
 
+        - name: Get CMake with Ninja
+          uses: lukka/get-cmake@latest
+          with:
+            cmakeVersion: latestrc
+            ninjaVersion: latest
+
+        - uses: ruby/setup-ruby@v1
+          with:
+            ruby-version: '2.6'
+            bundler-cache: true
+
+        - name: Setup Ruby
+          run: |
+            gem install colorize
+            gem install zip
+            gem install rake
+            ruby setup.rb
+
+        - name: Compile Clothoids
+          run: rake
+
         - name: Build sdist
           run: pipx run build --sdist
 
