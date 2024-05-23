@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-13, macos-14] # windows-latest - rake not working on windows, it says `Cannot determine architecture for Visual Studio`
+        os: [macos-13, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +33,7 @@ jobs:
         run: |
             gem install colorize
             gem install zip
+            gem install rake
             ruby setup.rb
 
       - name: Compile Clothoids
