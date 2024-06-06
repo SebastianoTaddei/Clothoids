@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 curve = Clothoids.ClothoidCurve("curve")
 curve.build_G1(0.0, 0.0, 0.0, 4.0, 4.0, 0.0)
 
+pydict = {"string": "Hello, World!", "number": 42}
+print(curve.get_gc())
+curve.set_gc(pydict)
+
 values = np.arange(0, curve.length(), 0.01, dtype=np.float64)
 points = np.zeros((values.size, 2))
 

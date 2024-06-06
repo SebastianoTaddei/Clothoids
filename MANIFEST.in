@@ -1,2 +1,3 @@
 include src_py/clothoids_interface.hh
 include src_py/Clothoids.i
+include src_py/GenericContainer.i

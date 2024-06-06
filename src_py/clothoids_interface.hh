@@ -1,4 +1,5 @@
 #include "Clothoids.hh"
+#include "GenericContainer/GenericContainer.hh"
 #include <string>
 #include <utility>
 #include <vector>
@@ -15,8 +16,7 @@ public:
   ClothoidCurve(std::string const &name = "") : clothoid_curve{name} {}
 
   ClothoidCurve(
-      double x0, double y0, double theta0, double k, double dk, double L,
-      std::string const &name
+    double x0, double y0, double theta0, double k, double dk, double L, std::string const &name
   )
       : clothoid_curve{x0, y0, theta0, k, dk, L, name}
   {
@@ -28,8 +28,7 @@ public:
   }
 
   int build_G1(
-      double x0, double y0, double theta0, double x1, double y1, double theta1,
-      double tol = 1e-12
+    double x0, double y0, double theta0, double x1, double y1, double theta1, double tol = 1e-12
   )
   {
     return this->clothoid_curve.build_G1(x0, y0, theta0, x1, y1, theta1, tol);
@@ -42,6 +41,16 @@ public:
     double x, y;
     this->clothoid_curve.eval(s, x, y);
     return {x, y};
+  }
+
+  void set_gc(GC_namespace::GenericContainer &gc) { gc.dump(std::cout); }
+
+  GC_namespace::GenericContainer get_gc()
+  {
+    GC_namespace::GenericContainer gc;
+    gc["string"] = "Hello";
+    gc["int"]    = 42;
+    return gc;
   }
 };
 
