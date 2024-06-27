@@ -67,13 +67,52 @@ public:
     return this->clothoid_list.build_G1(x.size(), x.data(), y.data());
   }
 
+  bool build(
+    const double &x0,
+    const double &y0,
+    const double &theta0,
+    std::vector<double> const &s,
+    std::vector<double> const &kappa
+  )
+  {
+    return this->clothoid_list.build(x0, y0, theta0, s, kappa);
+  }
+
   double length() { return this->clothoid_list.length(); }
 
-  std::pair<double, double> eval(double s)
+  std::pair<double, double> eval(const double &s)
   {
     double x, y;
     this->clothoid_list.eval(s, x, y);
     return {x, y};
+  }
+
+  std::vector<double> evaluate(const double &s)
+  {
+    double theta, kappa, x, y;
+    this->clothoid_list.evaluate(s, theta, kappa, x, y);
+    return {theta, kappa, x, y};
+  }
+
+  double theta(const double &s)
+  {
+    double theta;
+    theta = this->clothoid_list.theta(s);
+    return theta;
+  }
+
+  double theta_D(const double &s)
+  {
+    double theta_D;
+    theta_D = this->clothoid_list.theta_D(s);
+    return theta_D;
+  }
+
+  std::pair<double, double> findST1(const double &x, const double &y)
+  {
+    double s, n; // curvilinear abscissa and lateral coordinate
+    this->clothoid_list.findST1(x, y, s, n);
+    return {s, n};
   }
 };
 
