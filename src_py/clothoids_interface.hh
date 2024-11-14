@@ -43,6 +43,21 @@ public:
     return {x, y};
   }
 
+  std::pair<double, double> curvature_min_max()
+  {
+    double kappa_min, kappa_max;
+    this->clothoid_curve.curvature_min_max(kappa_min, kappa_max);
+    return {kappa_min, kappa_max};
+  }
+
+  double theta(double s) { return this->clothoid_curve.theta(s); }
+
+  double theta_D(double s) { return this->clothoid_curve.theta_D(s); }
+
+  double theta_DD(double s) { return this->clothoid_curve.theta_DD(s); }
+
+  double theta_DDD(double s) { return this->clothoid_curve.theta_DDD(s); }
+
   void set_gc(GC_namespace::GenericContainer &gc) { gc.dump(std::cout); }
 
   GC_namespace::GenericContainer get_gc()
