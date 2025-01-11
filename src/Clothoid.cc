@@ -18,6 +18,7 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 // workaround for windows that defines max and min as macros!
 #ifdef max
@@ -53,7 +54,7 @@ namespace G2lib {
   using std::isfinite;
 
   integer   ClothoidCurve::m_max_iter  = 10;
-  real_type ClothoidCurve::m_tolerance = 1e-9;
+  real_type ClothoidCurve::m_tolerance = 0.01745329252; // 1 degree
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -172,6 +173,7 @@ namespace G2lib {
   void ClothoidCurve::build( BiarcList const & )    { UTILS_ERROR("can convert from BiarcList to ClothoidCurve\n"); }
   void ClothoidCurve::build( ClothoidList const & ) { UTILS_ERROR("can convert from ClothoidList to ClothoidCurve\n"); }
   void ClothoidCurve::build( Dubins const & )       { UTILS_ERROR("can convert from Dubins to ClothoidCurve\n"); }
+  void ClothoidCurve::build( Dubins3p const & )     { UTILS_ERROR("can convert from Dubins3p to ClothoidCurve\n"); }
 
   // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -1233,6 +1235,18 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  ClothoidCurve::info() const
+  { return fmt::format( "Clothoid\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `ClothoidCurve` object
+  //!
+  //!  \param stream the output stream
+  //!  \param c      an instance of `ClothoidCurve` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, ClothoidCurve const & c ) {
     fmt::print( stream,

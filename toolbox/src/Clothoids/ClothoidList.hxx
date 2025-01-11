@@ -36,27 +36,33 @@ namespace G2lib {
 
   //!
   //! Construct a piecewise clothoids \f$ G(s) \f$ composed by
-  //! two clothoids arc that solve the G2 problem
+  //! two clothoids arc that solve the \f$ G^2 \f$ problem
   //!
   //! \f[
   //! \begin{array}{ll}
   //! \textrm{endpoints:}\quad &
-  //! \begin{cases}
-  //!   G(0) = \mathbf{p}_0 & \\[0.5em]
-  //!   G(L) = \mathbf{p}_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   G(0) &=& \mathbf{p}_0 \\[0.5em]
+  //!   G(L) &=& \mathbf{p}_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{angles:}\quad &
-  //! \begin{cases}
-  //!   \theta(0) = \theta_0 & \\[0.5em]
-  //!   \theta(L) = \theta_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \theta(0) &=& \theta_0 \\[0.5em]
+  //!   \theta(L) &=& \theta_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{curvature:}\quad &
-  //! \begin{cases}
-  //!   \kappa(0) = \kappa_0 & \\[0.5em]
-  //!   \kappa(L) = \kappa_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \kappa(0) &=& \kappa_0 \\[0.5em]
+  //!   \kappa(L) &=& \kappa_1
+  //! \end{array}
+  //! \right.
   //! \end{array}
   //! \f]
   //!
@@ -155,10 +161,14 @@ namespace G2lib {
 
     //!
     //! Construct a piecewise clothoids \f$ G(s) \f$ composed by
-    //! two clothoids arc that solve the G2 problem, with data
+    //! two clothoids arc that solve the \f$ G^2 \f$ problem, with data
     //!
-    //! \f[ \mathbf{p}_0 = (x_0,y_0)^T, \qquad \mathbf{p}_1 = (x_1,y_1)^T \f]
-    //! \f[ \theta_0, \qquad \theta_1, \qquad \kappa_0, \qquad \kappa_1 \f]
+    //! \f[
+    //!   \mathbf{p}_0 = (x_0,y_0)^T, \qquad \mathbf{p}_1 = (x_1,y_1)^T
+    //! \f]
+    //! \f[
+    //!   \theta_0, \qquad \theta_1, \qquad \kappa_0, \qquad \kappa_1
+    //! \f]
     //!
     //! \param[in] x0     \f$ x_0      \f$
     //! \param[in] y0     \f$ y_0      \f$
@@ -177,33 +187,33 @@ namespace G2lib {
     );
 
     //!
-    //! Fix tolerance for the G2 problem
+    //! Fix tolerance for the \f$ G^2 \f$ problem
     //!
     void set_tolerance( real_type tol );
 
     //!
-    //! Fix maximum number of iteration for the G2 problem
+    //! Fix maximum number of iteration for the \f$ G^2 \f$ problem
     //!
     void set_max_iter( integer miter );
 
     //!
-    //! Solve the G2 problem
+    //! Solve the \f$ G^2 \f$ problem
     //!
     //! \return number of iterations of -1 if failed
     //!
     int solve();
 
     //!
-    //! Return the first clothoid of the G2 clothoid list
+    //! Return the first clothoid of the \f$ G^2 \f$ clothoid list
     //!
     ClothoidCurve const & S0() const { return m_S0; }
 
     //!
-    //! Return the second clothoid of the G2 clothoid list
+    //! Return the second clothoid of the \f$ G^2 \f$ clothoid list
     //!
     ClothoidCurve const & S1() const { return m_S1; }
 
-    #ifdef G2LIB_COMPATIBILITY_MODE
+    #ifdef CLOTHOIDS_BACK_COMPATIBILITY
     void setTolerance( real_type tol ) { set_tolerance( tol ); }
     void setMaxIter( integer miter ) { set_max_iter( miter ); }
     #endif
@@ -220,27 +230,33 @@ namespace G2lib {
 
   //!
   //! Construct a piecewise clothoids \f$ G(s) \f$ composed by
-  //! 2 clothoid and one line segment that solve the G2 problem
+  //! 2 clothoid and one line segment that solve the \f$ G^2 \f$ problem
   //!
   //! \f[
   //! \begin{array}{ll}
   //! \textrm{endpoints:}\quad &
-  //! \begin{cases}
-  //!   G(0) = \mathbf{p}_0 & \\[0.5em]
-  //!   G(L) = \mathbf{p}_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   G(0) &=& \mathbf{p}_0 \\[0.5em]
+  //!   G(L) &=& \mathbf{p}_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{angles:}\quad &
-  //! \begin{cases}
-  //!   \theta(0) = \theta_0 & \\[0.5em]
-  //!   \theta(L) = \theta_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \theta(0) &=& \theta_0 \\[0.5em]
+  //!   \theta(L) &=& \theta_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{curvature:}\quad &
-  //! \begin{cases}
-  //!   \kappa(0) = \kappa_0 & \\[0.5em]
-  //!   \kappa(L)  = \kappa_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \kappa(0) &=& \kappa_0 \\[0.5em]
+  //!   \kappa(L) &=& \kappa_1
+  //! \end{array}
+  //! \right.
   //! \end{array}
   //! \f]
   //!
@@ -291,10 +307,14 @@ namespace G2lib {
 
     //!
     //! Construct a piecewise clothoids \f$ G(s) \f$ composed by
-    //! two clothoids and one line segment that solve the G2 problem, with data
+    //! two clothoids and one line segment that solve the \f$ G^2 \f$ problem, with data
     //!
-    //! \f[ \mathbf{p}_0 = (x_0,y_0)^T, \qquad \mathbf{p}_1 = (x_1,y_1)^T \f]
-    //! \f[ \theta_0, \qquad \theta_1, \qquad \kappa_0, \qquad \kappa_1 \f]
+    //! \f[
+    //!   \mathbf{p}_0 = (x_0,y_0)^T, \qquad \mathbf{p}_1 = (x_1,y_1)^T
+    //! \f]
+    //! \f[
+    //!   \theta_0, \qquad \theta_1, \qquad \kappa_0, \qquad \kappa_1
+    //! \f]
     //!
     //! \param[in] x0     \f$ x_0      \f$
     //! \param[in] y0     \f$ y_0      \f$
@@ -313,24 +333,24 @@ namespace G2lib {
     );
 
     //!
-    //! Fix tolerance for the G2 problem
+    //! Fix tolerance for the \f$ G^2 \f$ problem
     //!
     void set_tolerance( real_type tol );
 
     //!
-    //! Fix maximum number of iteration for the G2 problem
+    //! Fix maximum number of iteration for the \f$ G^2 \f$ problem
     //!
     void set_max_iter( integer miter );
 
     //!
-    //! Solve the G2 problem
+    //! Solve the \f$ G^2 \f$ problem
     //!
     //! \return number of iterations of -1 if failed
     //!
     int solve();
 
     //!
-    //! Return the first clothoid of the G2 clothoid list
+    //! Return the first clothoid of the \f$ G^2 \f$ clothoid list
     //!
     ClothoidCurve const & S0() const { return m_S0; }
 
@@ -340,13 +360,13 @@ namespace G2lib {
     ClothoidCurve const & SM() const { return m_SM; }
 
     //!
-    //! Return the third clothoid of the G2 clothoid list
+    //! Return the third clothoid of the \f$ G^2 \f$ clothoid list
     //!
     ClothoidCurve const & S1() const { return m_S1; }
 
     void save( ostream_type & stream ) const;
 
-    #ifdef G2LIB_COMPATIBILITY_MODE
+    #ifdef CLOTHOIDS_BACK_COMPATIBILITY
     void setTolerance( real_type tol ) { set_tolerance( tol ); }
     void setMaxIter( integer miter ) { set_max_iter( miter ); }
     #endif
@@ -363,29 +383,35 @@ namespace G2lib {
 
   //!
   //! Construct a piecewise clothoids \f$ G(s) \f$ composed by
-  //! 3 clothoid and one line segment that solve the G2 problem
+  //! 3 clothoid and one line segment that solve the \f$ G^2 \f$ problem
   //!
   //! **match**
   //!
   //! \f[
   //! \begin{array}{ll}
   //! \textrm{endpoints:}\quad&
-  //! \begin{cases}
-  //!   G(0) = \mathbf{p}_0 & \\[0.5em]
-  //!   G(L) = \mathbf{p}_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   G(0) &=& \mathbf{p}_0 \\[0.5em]
+  //!   G(L) &=& \mathbf{p}_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{angles:}\quad&
-  //! \begin{cases}
-  //!   \theta(0) = \theta_0 & \\[0.5em]
-  //!   \theta(L) = \theta_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \theta(0) &=& \theta_0 \\[0.5em]
+  //!   \theta(L) &=& \theta_1
+  //! \end{array}
+  //! \right.
   //! \\[1em]
   //! \textrm{curvature:}\quad&
-  //! \begin{cases}
-  //!   \kappa(0) = \kappa_0 & \\[0.5em]
-  //!   \kappa(L)  = \kappa_1 &
-  //! \end{cases}
+  //! \left\{
+  //! \begin{array}{r@{~}c@{~}l}
+  //!   \kappa(0) &=& \kappa_0 \\[0.5em]
+  //!   \kappa(L) &=& \kappa_1
+  //! \end{array}
+  //! \right.
   //! \end{array}
   //! \f]
   //!
@@ -393,16 +419,10 @@ namespace G2lib {
   //!
   //! The solution algorithm is described in
   //!
-  //! - **E.Bertolazzi, M.Frego**, On the G2 Hermite Interpolation Problem with clothoids
+  //! - **E.Bertolazzi, M.Frego**, On the \f$ G^2 \f$ Hermite Interpolation Problem with clothoids
   //!   Journal of Computational and Applied Mathematics, vol 341, pp. 99-116, 2018
   //!
-  //! \rst
-  //!
-  //!   .. image:: ../../images/G2problem3arc.jpg
-  //!      :width: 80%
-  //!      :align: center
-  //!
-  //! \endrst
+  //! @html_image{G2problem3arc.png,width=60%}
   //!
   class G2solve3arc {
 
@@ -413,7 +433,7 @@ namespace G2lib {
     real_type m_tolerance{real_type(1e-10)};
     int       m_max_iter{100};
 
-    // G2 interpolation data
+    // \f$ G^2 \f$ interpolation data
     real_type m_x0{real_type(0)};
     real_type m_y0{real_type(0)};
     real_type m_theta0{real_type(0)};
@@ -472,12 +492,12 @@ namespace G2lib {
     //void setup( GenericContainer const & gc );
 
     //!
-    //! Fix tolerance for the G2 problem
+    //! Fix tolerance for the \f$ G^2 \f$ problem
     //!
     void set_tolerance( real_type tol );
 
     //!
-    //! Fix maximum number of iteration for the G2 problem
+    //! Fix maximum number of iteration for the \f$ G^2 \f$ problem
     //!
     void set_max_iter( integer miter );
 
@@ -542,22 +562,22 @@ namespace G2lib {
     );
 
     //!
-    //! \return get the first clothoid for the 3 arc G2 fitting
+    //! \return get the first clothoid for the 3 arc \f$ G^2 \f$ fitting
     //!
     ClothoidCurve const & S0() const { return m_S0; }
 
     //!
-    //! \return get the last clothoid for the 3 arc G2 fitting
+    //! \return get the last clothoid for the 3 arc \f$ G^2 \f$ fitting
     //!
     ClothoidCurve const & S1() const { return m_S1; }
 
     //!
-    //! \return get the middle clothoid for the 3 arc G2 fitting
+    //! \return get the middle clothoid for the 3 arc \f$ G^2 \f$ fitting
     //!
     ClothoidCurve const & SM() const { return m_SM; }
 
     //!
-    //! \return get the length of the 3 arc G2 fitting
+    //! \return get the length of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     total_length() const {
@@ -568,7 +588,7 @@ namespace G2lib {
 
 
     //!
-    //! \return get the total angle variation of the 3 arc G2 fitting
+    //! \return get the total angle variation of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     theta_total_variation() const {
@@ -578,7 +598,7 @@ namespace G2lib {
     }
 
     //!
-    //! \return get the total curvature variation of the 3 arc G2 fitting
+    //! \return get the total curvature variation of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     curvature_total_variation() const {
@@ -588,7 +608,7 @@ namespace G2lib {
     }
 
     //!
-    //! \return get the integral of the curvature squared of the 3 arc G2 fitting
+    //! \return get the integral of the curvature squared of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     integral_curvature2() const {
@@ -598,7 +618,7 @@ namespace G2lib {
     }
 
     //!
-    //! \return get the integral of the jerk squared of the 3 arc G2 fitting
+    //! \return get the integral of the jerk squared of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     integral_jerk2() const {
@@ -608,7 +628,7 @@ namespace G2lib {
     }
 
     //!
-    //! \return get the integral of the snap squared of the 3 arc G2 fitting
+    //! \return get the integral of the snap squared of the 3 arc \f$ G^2 \f$ fitting
     //!
     real_type
     integral_snap2() const {
@@ -618,23 +638,23 @@ namespace G2lib {
     }
 
     //!
-    //! \param[out] thMin minimum angle in the 3 arc G2 fitting curve
-    //! \param[out] thMax maximum angle in the 3 arc G2 fitting curve
+    //! \param[out] thMin minimum angle in the 3 arc \f$ G^2 \f$ fitting curve
+    //! \param[out] thMax maximum angle in the 3 arc \f$ G^2 \f$ fitting curve
     //! \return the difference of `thMax` and `thMin`
     //!
     real_type
     theta_min_max( real_type & thMin, real_type & thMax ) const;
 
     //!
-    //! Return the difference of maximum-minimum angle in the 3 arc G2 fitting curve
+    //! Return the difference of maximum-minimum angle in the 3 arc \f$ G^2 \f$ fitting curve
     //!
     real_type
     delta_theta() const
     { real_type thMin, thMax; return theta_min_max( thMin, thMax ); }
 
     //!
-    //! \param[out] kMin minimum curvature in the 3 arc G2 fitting curve
-    //! \param[out] kMax maximum curvature in the 3 arc G2 fitting curve
+    //! \param[out] kMin minimum curvature in the 3 arc \f$ G^2 \f$ fitting curve
+    //! \param[out] kMax maximum curvature in the 3 arc \f$ G^2 \f$ fitting curve
     //! \return the difference of `kMax` and `kMin`
     //!
     real_type curvature_min_max( real_type & kMin, real_type & kMax ) const;
@@ -660,22 +680,22 @@ namespace G2lib {
     real_type theta_DDD( real_type s ) const;
 
     //!
-    //! Return x coordinate of the3 arc clothoid as a function of curvilinear coordinate
+    //! Return \f$x\f$-coordinate of the arc clothoid as a function of curvilinear coordinate
     //!
     real_type X( real_type s ) const;
 
     //!
-    //! Return y coordinate of the3 arc clothoid as a function of curvilinear coordinate
+    //! Return \f$y\f$-coordinate of the arc clothoid as a function of curvilinear coordinate
     //!
     real_type Y( real_type s ) const;
 
     //!
-    //! Return initial x coordinate of the 3 arc clothoid
+    //! Return initial \f$x\f$-coordinate of the 3 arc clothoid
     //!
     real_type x_begin() const { return m_S0.x_begin(); }
 
     //!
-    //! Return initial y coordinate of the 3 arc clothoid
+    //! Return initial \f$y\f$-coordinate of the 3 arc clothoid
     //!
     real_type y_begin() const { return m_S0.y_begin(); }
 
@@ -690,12 +710,12 @@ namespace G2lib {
     real_type theta_begin() const { return m_S0.theta_begin(); }
 
     //!
-    //! Return final x coordinate of the 3 arc clothoid
+    //! Return final \f$x\f$-coordinate of the 3 arc clothoid
     //!
     real_type x_end()const { return m_S1.x_end(); }
 
     //!
-    //! Return final y coordinate of the 3 arc clothoid
+    //! Return final \f$y\f$-coordinate of the 3 arc clothoid
     //!
     real_type y_end() const { return m_S1.y_end(); }
 
@@ -710,13 +730,13 @@ namespace G2lib {
     real_type theta_end() const { return m_S1.theta_end(); }
 
     //!
-    //! Compute parameters of 3 arc clothoid at curvilinear coordinate `s`
+    //! Compute parameters of 3 arc clothoid at curvilinear coordinate \f$s\f$
     //!
     //! \param[in]  s     curvilinear coordinate of where curve is computed
     //! \param[out] theta the curve angle
     //! \param[out] kappa the curve curvature
-    //! \param[out] x     the curve x-coordinate
-    //! \param[out] y     the curve y-coordinate
+    //! \param[out] x     the curve \f$x\f$-coordinate
+    //! \param[out] y     the curve \f$y\f$-coordinate
     //!
     void
     eval(
@@ -728,51 +748,51 @@ namespace G2lib {
     ) const;
 
     //!
-    //! x and y-coordinate at curvilinear coordinate `s`
+    //! x and \f$y\f$-coordinate at curvilinear coordinate \f$s\f$
     //!
     void eval( real_type s, real_type & x, real_type & y ) const;
 
     //!
-    //! x and y-coordinate derivative at curvilinear coordinate `s`
+    //! x and \f$y\f$-coordinate derivative at curvilinear coordinate \f$s\f$
     //!
     void eval_D( real_type s, real_type & x_D, real_type & y_D ) const;
 
     //!
-    //! x and y-coordinate second derivative at curvilinear coordinate `s`
+    //! x and \f$y\f$-coordinate second derivative at curvilinear coordinate \f$s\f$
     //!
     void eval_DD( real_type s, real_type & x_DD, real_type & y_DD ) const;
 
     //!
-    //! x and y-coordinate third derivative at curvilinear coordinate `s`
+    //! x and \f$y\f$-coordinate third derivative at curvilinear coordinate \f$s\f$
     //!
     void eval_DDD( real_type s, real_type & x_DDD, real_type & y_DDD ) const;
 
     //!
-    //! x and y-coordinate at curvilinear coordinate `s` with offset
+    //! x and \f$y\f$-coordinate at curvilinear coordinate \f$s\f$ with offset
     //!
     void eval_ISO( real_type s, real_type offs, real_type & x, real_type & y ) const;
 
     //!
-    //! x and y-coordinate derivative at curvilinear coordinate `s` with offset
+    //! x and \f$y\f$-coordinate derivative at curvilinear coordinate \f$s\f$ with offset
     //!
     void eval_ISO_D( real_type s, real_type offs, real_type & x_D, real_type & y_D ) const;
 
     //!
-    //! x and y-coordinate second derivative at curvilinear coordinate `s` with offset
+    //! x and \f$y\f$-coordinate second derivative at curvilinear coordinate \f$s\f$ with offset
     //!
     void eval_ISO_DD( real_type s, real_type offs, real_type & x_DD, real_type & y_DD ) const;
 
     //!
-    //! x and y-coordinate third derivative at curvilinear coordinate `s` with offset
+    //! x and \f$y\f$-coordinate third derivative at curvilinear coordinate \f$s\f$ with offset
     //!
     void eval_ISO_DDD( real_type s, real_type offs, real_type & x_DDD, real_type & y_DDD ) const;
 
     //!
-    //! Rotate curve by angle \f$ theta \f$ centered at point  \f$ (c_x,c_y)\f$
+    //! Rotate curve by angle \f$ \theta \f$ centered at point \f$ (c_x,c_y) \f$
     //!
-    //! \param[in] angle angle \f$ theta \f$
-    //! \param[in] cx    \f$ c_x\f$
-    //! \param[in] cy    \f$ c_y\f$
+    //! \param[in] angle angle \f$ \theta \f$
+    //! \param[in] cx    \f$ c_x \f$
+    //! \param[in] cy    \f$ c_y \f$
     //!
     void
     rotate( real_type angle, real_type cx, real_type cy ) {
@@ -810,7 +830,7 @@ namespace G2lib {
     void save( ostream_type & stream ) const;
 
     // BACK COMPATIBILITY
-    #ifdef G2LIB_COMPATIBILITY_MODE
+    #ifdef CLOTHOIDS_BACK_COMPATIBILITY
     void setTolerance( real_type tol ) { set_tolerance( tol ); }
     void setMaxIter( integer miter ) { set_max_iter( miter ); }
     real_type thetaTotalVariation() const { return theta_total_variation(); }
@@ -834,15 +854,9 @@ namespace G2lib {
   \*/
   //!
   //! Manage a piecewise clothoids \f$ G(s) \f$ composed by
-  //! n clothoids (not necessarily G2 or G1 connected)
+  //! \f$ n \f$ clothoids (not necessarily \f$ G^2 \f$ or \f$ G^1 \f$ connected)
   //!
-  //! \rst
-  //!
-  //!   .. image:: ../../images/G2problem3arc.jpg
-  //!      :width: 80%
-  //!      :align: center
-  //!
-  //! \endrst
+  //! @html_image{G2problem3arc.png,width=60%}
   //!
   class ClothoidList : public BaseCurve {
 
@@ -851,7 +865,8 @@ namespace G2lib {
     vector<ClothoidCurve> m_clothoid_list;
 
     #ifdef CLOTHOIDS_USE_THREADS
-    mutable Utils::BinarySearch<integer> m_last_interval;
+    mutable std::mutex                                         m_last_interval_mutex;
+    mutable std::map<std::thread::id,std::shared_ptr<integer>> m_last_interval;
     #else
     mutable integer m_last_interval{0};
     #endif
@@ -870,8 +885,11 @@ namespace G2lib {
     void
     reset_last_interval() {
       #ifdef CLOTHOIDS_USE_THREADS
-      bool ok;
-      integer & last_interval = *m_last_interval.search( std::this_thread::get_id(), ok );
+      std::unique_lock<std::mutex> lock(m_last_interval_mutex);
+      auto id = std::this_thread::get_id();
+      auto it = m_last_interval.find(id);
+      if ( it == m_last_interval.end() ) it = m_last_interval.insert( {id,std::make_shared<integer>()} ).first;
+      integer & last_interval{ *it->second.get() };
       #else
       integer & last_interval = m_last_interval;
       #endif
@@ -995,10 +1013,11 @@ namespace G2lib {
     void build( PolyLine const & );
     void build( BiarcList const & );
     void build( ClothoidList const & );
-    void build( Dubins const & );
     void build( G2solve2arc const & );
     void build( G2solve3arc const & );
     void build( G2solveCLC const & );
+    void build( Dubins const & );
+    void build( Dubins3p const & );
 
     //!
     //! Add a line segment to the tail of clothoid list
@@ -1034,6 +1053,11 @@ namespace G2lib {
     //! Add a dubins 3 arc curve to the tail of clothoid list
     //!
     void push_back( Dubins const & c );
+
+    //!
+    //! Add a dubins 6 arc curve to the tail of clothoid list
+    //!
+    void push_back( Dubins3p const & c );
 
     //!
     //! Add a G2solve2arc to the tail of clothoid list
@@ -1091,7 +1115,7 @@ namespace G2lib {
     );
 
     //!
-    //! Add a clothoid to the tail of the clothoid list solving the G1 problem.
+    //! Add a clothoid to the tail of the clothoid list solving the \f$ G^1 \f$ problem.
     //! The initial point and angle are taken from the tail of the clothoid list.
     //!
     //! \param x1     final x
@@ -1106,7 +1130,7 @@ namespace G2lib {
     );
 
     //!
-    //! Add a clothoid to the tail of the clothoid list solving the G1 problem.
+    //! Add a clothoid to the tail of the clothoid list solving the \f$ G^1 \f$ problem.
     //! The initial point and angle are taken from the tail of the clothoid list.
     //! The builded clothoid is translated to the tail of the clothioid list.
     //!
@@ -1180,12 +1204,12 @@ namespace G2lib {
 
     //!
     //! Build clothoid list passing to a list of points
-    //! solving a series of G1 fitting problems.
+    //! solving a series of \f$ G^1 \f$ fitting problems.
     //! The angle at points are estimated using the routine `xy_to_guess_angle`
     //!
     //! \param[in] n number of points
-    //! \param[in] x x-coordinates
-    //! \param[in] y y-coordinates
+    //! \param[in] x \f$x\f$-coordinates
+    //! \param[in] y \f$y\f$-coordinates
     //!
     //! \return false if routine fails
     //!
@@ -1198,11 +1222,11 @@ namespace G2lib {
 
     //!
     //! Build clothoid list passing to a list of points
-    //! solving a series of G1 fitting problems.
+    //! solving a series of \f$ G^1 \f$ fitting problems.
     //!
     //! \param[in] n     number of points
-    //! \param[in] x     x-coordinates
-    //! \param[in] y     y-coordinates
+    //! \param[in] x     \f$x\f$-coordinates
+    //! \param[in] y     \f$y\f$-coordinates
     //! \param[in] theta angles at the points
     //!
     //! \return false if routine fails
@@ -1216,7 +1240,41 @@ namespace G2lib {
     );
 
     //!
-    //! Build clothoid list with G2 continuity.
+    //! \brief Smooths a G1 spline of clothoids to minimize jumps in curvature.
+    //!
+    //! This function applies a smoothing algorithm to reduce discontinuities
+    //! in curvature, enhancing the overall continuity and visual quality of the spline.
+    //! The smoothing process iterates up to a specified maximum number of iterations.
+    //!
+    //! \param max_iter Maximum number of iterations for the smoothing process.
+    //!                 This parameter controls how many times the smoothing
+    //!                 algorithm will attempt to refine the spline.
+    //! \param epsi     Tolerance for the smoothing process. It determines the
+    //!                 threshold below which curvature adjustments are considered
+    //!                 negligible and thus terminates the algorithm.
+    //! \param max_dK   Reference to a variable that will hold the maximum change
+    //!                 in curvature observed during the smoothing process. This
+    //!                 output can be used to assess the effectiveness of the
+    //!                 smoothing operation.
+    //!
+    //! \return Returns true if the smoothing was successful; otherwise, false.
+    //!
+    //! \note This function assumes that the input spline is already in a G1
+    //!       state and is defined using clothoids. Ensure that the input parameters
+    //!       are properly initialized before calling this function.
+    //!
+    //! \note If curve is closed and cyclic algorithm try to reduce the jump in curvature
+    //!       between first and last point.
+    //!
+    bool
+    smooth_quasi_G2(
+      integer     max_iter,
+      real_type   epsi,
+      real_type & max_dK
+    );
+
+    //!
+    //! Build clothoid list with \f$ G^2 \f$ continuity.
     //! The vector `s` contains the breakpoints of the curve.
     //! Between two breakpoint the curvature change linearly (is a clothoid)
     //!
@@ -1240,7 +1298,7 @@ namespace G2lib {
     );
 
     //!
-    //! Build clothoid list with G2 continuity.
+    //! Build clothoid list with \f$ G^2 \f$ continuity.
     //! The vector `s` contains the breakpoints of the curve.
     //! Between two breakpoint the curvature change linearly (is a clothoid)
     //!
@@ -1272,8 +1330,8 @@ namespace G2lib {
     //! Build clothoid listy using raw data.
     //!
     //! \param[in] n        number of points
-    //! \param[in] x        x-coordinates
-    //! \param[in] y        y-coordinates
+    //! \param[in] x        \f$x\f$-coordinates
+    //! \param[in] y        \f$y\f$-coordinates
     //! \param[in] abscissa break point of the piecewise curve
     //! \param[in] theta    angles at breakpoints
     //! \param[in] kappa    curvature at the break point
@@ -1293,8 +1351,8 @@ namespace G2lib {
     //!
     //! Build clothoid listy using raw data.
     //!
-    //! \param[in] x        x-coordinates
-    //! \param[in] y        y-coordinates
+    //! \param[in] x        \f$x\f$-coordinates
+    //! \param[in] y        \f$y\f$-coordinates
     //! \param[in] abscissa break point of the piecewise curve
     //! \param[in] theta    angles at breakpoints
     //! \param[in] kappa    curvature at the break point
@@ -1337,8 +1395,8 @@ namespace G2lib {
 
     //!
     //! The list of clothoid has total length \f$ L \f$
-    //! the parameter \f$ s \f$ us recomputed as \f$ s+kL\f$ in such a way
-    //! \f$ s+kL\in[0,L)\f$ with \f$ k\in\mathbb{Z} \f$.
+    //! the parameter \f$ s \f$ us recomputed as \f$ s+kL \f$ in such a way
+    //! \f$ s+kL\in[0,L) \f$ with \f$ k\in\mathbb{Z} \f$.
     //!
     void wrap_in_range( real_type & s ) const;
 
@@ -1724,10 +1782,10 @@ namespace G2lib {
     \*/
 
     //!
-    //! \param  qx     x-coordinate of the point
-    //! \param  qy     y-coordinate of the point
-    //! \param  x      x-coordinate of the projected point on the curve
-    //! \param  y      y-coordinate of the projected point on the curve
+    //! \param  qx     \f$x\f$-coordinate of the point
+    //! \param  qy     \f$y\f$-coordinate of the point
+    //! \param  x      \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y      \f$y\f$-coordinate of the projected point on the curve
     //! \param  s      parameter on the curve of the projection
     //! \param  t      curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst    distance point projected point
@@ -1746,11 +1804,11 @@ namespace G2lib {
     ) const override;
 
     //!
-    //! \param  qx    x-coordinate of the point
-    //! \param  qy    y-coordinate of the point
+    //! \param  qx    \f$x\f$-coordinate of the point
+    //! \param  qy    \f$y\f$-coordinate of the point
     //! \param  offs  offset of the curve
-    //! \param  x     x-coordinate of the projected point on the curve
-    //! \param  y     y-coordinate of the projected point on the curve
+    //! \param  x     \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y     \f$y\f$-coordinate of the projected point on the curve
     //! \param  s     parameter on the curve of the projection
     //! \param  t     curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst   distance point projected point
@@ -1774,10 +1832,10 @@ namespace G2lib {
     //! using the optimized algorithm described in the publication:
     //!
     //! \param  ds sampling step
-    //! \param  qx x-coordinate of the given point
-    //! \param  qy y-coordinate of the given point
-    //! \param  X  x-coordinate of the point on clothoid at minimal distance
-    //! \param  Y  y-coordinate of the point on clothoid at minimal distance
+    //! \param  qx \f$x\f$-coordinate of the given point
+    //! \param  qy \f$y\f$-coordinate of the given point
+    //! \param  X  \f$x\f$-coordinate of the point on clothoid at minimal distance
+    //! \param  Y  \f$y\f$-coordinate of the point on clothoid at minimal distance
     //! \param  S  curvilinear coordinate of the point (X,Y) on the clothoid
     //! \return the distance of the point from the clothoid
     //!
@@ -1800,20 +1858,20 @@ namespace G2lib {
     \*/
 
     //!
-    //! \param  qx  x-coordinate of the point
-    //! \param  qy  y-coordinate of the point
+    //! \param  qx  \f$x\f$-coordinate of the point
+    //! \param  qy  \f$y\f$-coordinate of the point
     //! \return the segment at minimal distance from point (qx,qy)
     //!
     integer
     closest_segment( real_type qx, real_type qy ) const;
 
     //!
-    //! \param  qx           x-coordinate of the point
-    //! \param  qy           y-coordinate of the point
+    //! \param  qx           \f$x\f$-coordinate of the point
+    //! \param  qy           \f$y\f$-coordinate of the point
     //! \param  icurve_begin index of the initial segment
     //! \param  icurve_end   index of the past to the last segment
-    //! \param  x            x-coordinate of the projected point on the curve
-    //! \param  y            y-coordinate of the projected point on the curve
+    //! \param  x            \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y            \f$y\f$-coordinate of the projected point on the curve
     //! \param  s            parameter on the curve of the projection
     //! \param  t            curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst          distance point projected point
@@ -1837,12 +1895,12 @@ namespace G2lib {
     ) const;
 
     //!
-    //! \param  qx           x-coordinate of the point
-    //! \param  qy           y-coordinate of the point
+    //! \param  qx           \f$x\f$-coordinate of the point
+    //! \param  qy           \f$y\f$-coordinate of the point
     //! \param  icurve_begin index of the initial segment
     //! \param  icurve_end   index of the past to the last segment
-    //! \param  x            x-coordinate of the projected point on the curve
-    //! \param  y            y-coordinate of the projected point on the curve
+    //! \param  x            \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y            \f$y\f$-coordinate of the projected point on the curve
     //! \param  s            parameter on the curve of the projection
     //! \param  t            curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst          distance point projected point
@@ -1872,12 +1930,12 @@ namespace G2lib {
     }
 
     //!
-    //! \param  qx      x-coordinate of the point
-    //! \param  qy      y-coordinate of the point
+    //! \param  qx      \f$x\f$-coordinate of the point
+    //! \param  qy      \f$y\f$-coordinate of the point
     //! \param  s_begin initial curvilinear coordinate of the search range
     //! \param  s_end   final curvilinear coordinate of the search range
-    //! \param  x       x-coordinate of the projected point on the curve
-    //! \param  y       y-coordinate of the projected point on the curve
+    //! \param  x       \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y       \f$y\f$-coordinate of the projected point on the curve
     //! \param  s       parameter on the curve of the projection
     //! \param  t       curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst     distance point projected point
@@ -1900,12 +1958,12 @@ namespace G2lib {
     ) const;
 
     //!
-    //! \param  qx      x-coordinate of the point
-    //! \param  qy      y-coordinate of the point
+    //! \param  qx      \f$x\f$-coordinate of the point
+    //! \param  qy      \f$y\f$-coordinate of the point
     //! \param  s_begin initial curvilinear coordinate of the search range
     //! \param  s_end   final curvilinear coordinate of the search range
-    //! \param  x       x-coordinate of the projected point on the curve
-    //! \param  y       y-coordinate of the projected point on the curve
+    //! \param  x       \f$x\f$-coordinate of the projected point on the curve
+    //! \param  y       \f$y\f$-coordinate of the projected point on the curve
     //! \param  s       parameter on the curve of the projection
     //! \param  t       curvilinear coordinate of the point x,y (if orthogonal projection)
     //! \param  dst     distance point projected point
@@ -1917,8 +1975,8 @@ namespace G2lib {
     closest_point_in_s_range_SAE(
       real_type   qx,
       real_type   qy,
-      integer     s_begin,
-      integer     s_end,
+      real_type   s_begin,
+      real_type   s_end,
       real_type & x,
       real_type & y,
       real_type & s,
@@ -1933,9 +1991,7 @@ namespace G2lib {
       return res;
     }
 
-    string
-    info() const
-    { return fmt::format( "ClothoidList\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const override
@@ -1952,7 +2008,7 @@ namespace G2lib {
     //! \param[out] kappa curvature
     //!
     void
-    get_SK( real_type * s, real_type * kappa ) const;
+    get_SK( real_type s[], real_type kappa[] ) const;
 
     //!
     //! Return the clothoid list as a list of nodes and curvatures
@@ -1979,9 +2035,9 @@ namespace G2lib {
     //!
     void
     get_STK(
-      real_type * s,
-      real_type * theta,
-      real_type * kappa
+      real_type s[],
+      real_type theta[],
+      real_type kappa[]
     ) const;
 
     //!
@@ -2006,27 +2062,27 @@ namespace G2lib {
     //!
     //! Return the points of the clothoid list at breakpoints
     //!
-    //! \param[out] x x-coordinates
-    //! \param[out] y y-coordinates
+    //! \param[out] x \f$x\f$-coordinates
+    //! \param[out] y \f$y\f$-coordinates
     //!
     void
-    get_XY( real_type * x, real_type * y ) const;
+    get_XY( real_type x[], real_type y[] ) const;
 
     void
-    get_delta_theta( real_type * delta_theta ) const;
+    get_delta_theta( real_type delta_theta[] ) const;
 
     void
-    get_delta_kappa( real_type * deltaKappa ) const;
+    get_delta_kappa( real_type deltaKappa[] ) const;
 
     //!
     //! Find parametric coordinate.
     //!
-    //! \param  x    x-coordinate point
-    //! \param  y    y-coordinate point
+    //! \param  x    \f$x\f$-coordinate point
+    //! \param  y    \f$y\f$-coordinate point
     //! \param  s    value \f$ s \f$
     //! \param  t    value \f$ t \f$
     //! \return idx  the segment with point at minimal distance, otherwise
-    //!              -(idx+1) if (x,y) cannot be projected orthogonally on the segment
+    //!              -(idx+1) if \f$ (x,y) \f$ cannot be projected orthogonally on the segment
     //!
     integer
     findST1(
@@ -2041,12 +2097,12 @@ namespace G2lib {
     //!
     //! \param  ibegin initial segment to compute the distance
     //! \param  iend   final segment to compute the distance
-    //! \param  x      x-coordinate point
-    //! \param  y      y-coordinate point
+    //! \param  x      \f$x\f$-coordinate point
+    //! \param  y      \f$y\f$-coordinate point
     //! \param  s      value \f$ s \f$
     //! \param  t      value \f$ t \f$
     //! \return idx    the segment with point at minimal distance, otherwise
-    //!                -(idx+1) if (x,y) cannot be projected orthogonally on the segment
+    //!                `-(idx+1)` if \f$ (x,y) \f$ cannot be projected orthogonally on the segment
     //!
     integer
     findST1(
@@ -2206,13 +2262,22 @@ namespace G2lib {
   \*/
 
   //!
-  //! Class for the computation of G2 spljne of clothoids
+  //! Class for the computation of \f$ G^2 \f$ spljne of clothoids
   //!
   class ClothoidSplineG2 {
   public:
+    //!
+    //! Type of Spline list to be build
+    //!
     using TargetType = enum class TargetType : integer
     { P1, P2, P3, P4, P5, P6, P7, P8, P9 };
 
+    //!
+    //! Convert `TargetType` to string
+    //!
+    //! \param[in] n the target type
+    //! \return a string with the name of the target
+    //!
     static
     inline
     string
@@ -2283,9 +2348,9 @@ namespace G2lib {
 
     void
     build(
-      real_type const * xvec,
-      real_type const * yvec,
-      integer           npts
+      real_type const xvec[],
+      real_type const yvec[],
+      integer         npts
     );
 
     integer numPnts() const { return m_npts; }
@@ -2294,9 +2359,9 @@ namespace G2lib {
 
     void
     guess(
-      real_type * theta_guess,
-      real_type * theta_min,
-      real_type * theta_max
+      real_type theta_guess[],
+      real_type theta_min[],
+      real_type theta_max[]
     ) const;
 
     bool
@@ -2312,17 +2377,15 @@ namespace G2lib {
     jacobian_nnz() const;
 
     bool
-    jacobian_pattern( integer * i, integer * j ) const;
+    jacobian_pattern( integer i[], integer j[] ) const;
 
     bool
-    jacobian_pattern_matlab( real_type * i, real_type * j ) const;
+    jacobian_pattern_matlab( real_type i[], real_type j[] ) const;
 
     bool
-    jacobian( real_type const * theta, real_type * vals ) const;
+    jacobian( real_type const theta[], real_type vals[] ) const;
 
-    string
-    info() const
-    { return fmt::format( "ClothoidSplineG2\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const

@@ -14,12 +14,11 @@ classdef Dubins < CurveBase
     %>
     %> **Usage**
     %>
-    %> \rst
-    %> .. code-block:: matlab
+    %> ```{matlab}
     %>
     %>   B = A.copy();
     %>
-    %> \endrst
+    %> ```
     %>
     %> where `A` is the curve object to be copied.
     %>
@@ -35,15 +34,14 @@ classdef Dubins < CurveBase
     %>
     %> **Usage:**
     %>
-    %> \rst
-    %> .. code-block:: matlab
+    %> ```{matlab}
     %>
     %>   self = Biarc();
     %>   self = Biarc( x0, y0, theta0, x1, y1, theta1 );
     %>
-    %> \endrst
+    %> ```
     %>
-    %> **Optinal Arguments:**
+    %> **Optional Arguments:**
     %>
     %> - `x0`, `y0`: coordinate of initial point
     %> - `theta0`    : orientation of the clothoid at initial point
@@ -69,12 +67,11 @@ classdef Dubins < CurveBase
     %>
     %> **Usage:**
     %>
-    %> \rst
-    %> .. code-block:: matlab
+    %> ```{matlab}
     %>
     %>   ref.build_G1( x0, y0, theta0, x1, y1, theta1 );
     %>
-    %> \endrst
+    %> ```
     %>
     %> **On input:**
     %>
@@ -87,15 +84,23 @@ classdef Dubins < CurveBase
       ok = DubinsMexWrapper( 'build', self.objectHandle, x0, y0, theta0, x3, y3, theta3, k_max );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function angles = get_range_angles_begin( self, x0, y0, x3, y3, theta3, k_max )
+      angles = DubinsMexWrapper( 'get_range_angles_begin', self.objectHandle, x0, y0, x3, y3, theta3, k_max );
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function angles = get_range_angles_end( self, x0, y0, theta0, x3, y3, k_max )
+      angles = DubinsMexWrapper( 'get_range_angles_end', self.objectHandle, x0, y0, theta0, x3, y3, k_max );
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function S = get_pars( self )
       S = DubinsMexWrapper( 'get_pars', self.objectHandle );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function [C0,C1,C2] = get_circles( self )
       S = DubinsMexWrapper( 'get_pars', self.objectHandle );
-      C0 = CircleArc( S.x0, S.y0, S.theta0, S.kappa0, S.L0 );
-      C1 = CircleArc( S.x1, S.y1, S.theta1, S.kappa1, S.L1 );
-      C2 = CircleArc( S.x2, S.y2, S.theta2, S.kappa2, S.L2 );
+      C0 = CircleArc( S.x0, S.y0, S.theta0, S.kappa1, S.L1 );
+      C1 = CircleArc( S.x1, S.y1, S.theta1, S.kappa2, S.L2 );
+      C2 = CircleArc( S.x2, S.y2, S.theta2, S.kappa3, S.L3 );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     function varargout = length( self )
@@ -106,12 +111,17 @@ classdef Dubins < CurveBase
       res = DubinsMexWrapper( 'curve_type', self.objectHandle );
     end
     % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    function [l,s] = curve_type_string( self )
+      % l = long string
+      % s = short string
+      [l,s] = DubinsMexWrapper( 'curve_type_string', self.objectHandle );
+    end
+    % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     %> Plot the biarc
     %>
     %> **Usage:**
     %>
-    %> \rst
-    %> .. code-block:: matlab
+    %> ```{matlab}
     %>
     %>   ref.plot( npts );
     %>
@@ -119,7 +129,7 @@ classdef Dubins < CurveBase
     %>   fmt2 = {'Color','red','Linewidth',2};
     %>   ref.plot( npts, fmt1, fmt2 );
     %>
-    %> \endrst
+    %> ```
     %>
     %> - `npts`: number of sampling points for plotting
     %> - `fmt1`: format of the first arc

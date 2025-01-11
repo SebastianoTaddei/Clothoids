@@ -18,6 +18,7 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 // Workaround for Visual Studio
 #ifdef min
@@ -69,6 +70,7 @@ namespace G2lib {
   void PolyLine::build( PolyLine const & PL )   { *this = PL; }
   void PolyLine::build( ClothoidList const & )  { UTILS_ERROR("can convert from ClothoidList to PolyLine\n"); }
   void PolyLine::build( Dubins const & )        { UTILS_ERROR("can convert from Dubins to PolyLine\n"); }
+  void PolyLine::build( Dubins3p const & )      { UTILS_ERROR("can convert from Dubins3p to PolyLine\n"); }
 
   /*\
    |  ____       _       _     _
@@ -155,8 +157,15 @@ namespace G2lib {
   integer
   PolyLine::find_at_s( real_type & s ) const {
     #ifdef CLOTHOIDS_USE_THREADS
-    bool ok;
-    integer & last_interval = *m_last_interval.search( std::this_thread::get_id(), ok );
+    std::unique_lock<std::mutex> lock(m_last_interval_mutex);
+    auto id = std::this_thread::get_id();
+    auto it = m_last_interval.find(id);
+    if ( it == m_last_interval.end() ) {
+      it = m_last_interval.insert( {id,std::make_shared<integer>()} ).first;
+      *it->second.get() = 0;
+    }
+    integer & last_interval{ *it->second.get() };
+    lock.unlock();
     #else
     integer & last_interval = m_last_interval;
     #endif
@@ -173,7 +182,6 @@ namespace G2lib {
   PolyLine::init() {
     m_s0.clear();
     m_polyline_list.clear();
-    this->reset_last_interval();
     m_aabb_done = false;
     this->reset_last_interval();
   }
@@ -212,7 +220,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  PolyLine::polygon( real_type * x, real_type * y) const {
+  PolyLine::polygon( real_type x[], real_type y[] ) const {
     integer n = integer(m_polyline_list.size());
     for ( size_t k = 0; k < size_t(n); ++k ) {
       x[k] = m_polyline_list[k].x_begin();
@@ -267,6 +275,17 @@ namespace G2lib {
       if      ( y < ymin ) ymin = y;
       else if ( y > ymax ) ymax = y;
     }
+  }
+
+  void
+  PolyLine::bbox_ISO(
+    real_type   /* offs */,
+    real_type & /* xmin */,
+    real_type & /* ymin */,
+    real_type & /* xmax */,
+    real_type & /* ymax */
+  ) const {
+    UTILS_ERROR0( "PolyLine::bbox( offs ... ) not available!\n" );
   }
 
   /*\
@@ -814,6 +833,20 @@ namespace G2lib {
     return ipos;
   }
 
+  integer
+  PolyLine::closest_point_ISO(
+    real_type   /* x    */,
+    real_type   /* y    */,
+    real_type   /* offs */,
+    real_type & /* X    */,
+    real_type & /* Y    */,
+    real_type & /* S    */,
+    real_type & /* T    */,
+    real_type & /* DST  */
+  ) const {
+    UTILS_ERROR( "PolyLine::closest_point_ISO( ... offs ... ) not available!\n" );
+  }
+
   /*\
    |             _ _ _     _
    |    ___ ___ | | (_)___(_) ___  _ __
@@ -849,6 +882,19 @@ namespace G2lib {
       }
     }
     return false;
+  }
+
+  bool
+  PolyLine::collision_ISO(
+    real_type        offs,
+    PolyLine const & CL,
+    real_type        offs_CL
+  ) const {
+    UTILS_ASSERT0(
+      Utils::is_zero(offs) && Utils::is_zero(offs_CL),
+      "PolyLine::collision( offs ... ) not available!\n"
+    );
+    return this->collision( CL );
   }
 
   /*\
@@ -917,8 +963,34 @@ namespace G2lib {
       ilist.emplace_back( s1[i], s2[i] );
   }
 
+  void
+  PolyLine::intersect_ISO(
+    real_type        offs,
+    PolyLine const & pl,
+    real_type        offs_pl,
+    IntersectList  & ilist
+  ) const {
+    UTILS_ASSERT0(
+      Utils::is_zero(offs) && Utils::is_zero(offs_pl),
+      "PolyLine::intersect( offs ... ) not available!\n"
+    );
+    this->intersect( pl, ilist );
+  }
+
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  PolyLine::info() const
+  { return fmt::format( "PolyLine\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `PolyLine` object
+  //!
+  //!  \param stream the output stream
+  //!  \param P      an instance of `PolyLine` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, PolyLine const & P ) {
     fmt::print( stream,

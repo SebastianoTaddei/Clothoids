@@ -18,6 +18,7 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 #include <cfloat>
 #include <limits>
@@ -131,6 +132,13 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  void
+  BiarcList::build( Dubins3p const & ) {
+    UTILS_ERROR("can convert from Dubins3p to BiarcList\n");
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   /*\
    |   ____ _       _   _           _     _ _     _     _
    |  / ___| | ___ | |_| |__   ___ (_) __| | |   (_)___| |_
@@ -210,8 +218,15 @@ namespace G2lib {
   integer
   BiarcList::find_at_s( real_type & s ) const {
     #ifdef CLOTHOIDS_USE_THREADS
-    bool ok;
-    integer & last_interval = *m_last_interval.search( std::this_thread::get_id(), ok );
+    std::unique_lock<std::mutex> lock(m_last_interval_mutex);
+    auto id = std::this_thread::get_id();
+    auto it = m_last_interval.find(id);
+    if ( it == m_last_interval.end() ) {
+      it = m_last_interval.insert( {id,std::make_shared<integer>()} ).first;
+      *it->second.get() = 0;
+    }
+    integer & last_interval{ *it->second.get() };
+    lock.unlock();
     #else
     integer & last_interval = m_last_interval;
     #endif
@@ -1434,9 +1449,9 @@ namespace G2lib {
 
   void
   BiarcList::get_STK(
-    real_type * s,
-    real_type * theta,
-    real_type * kappa
+    real_type s[],
+    real_type theta[],
+    real_type kappa[]
   ) const {
     vector<Biarc>::const_iterator ic = m_biarc_list.begin();
     integer   k{0};
@@ -1458,7 +1473,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  BiarcList::get_XY( real_type * x, real_type * y ) const {
+  BiarcList::get_XY( real_type x[], real_type y[] ) const {
     vector<Biarc>::const_iterator ic = m_biarc_list.begin();
     integer k{0};
     while ( ic != m_biarc_list.end() ) {
@@ -1554,6 +1569,18 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  BiarcList::info() const
+  { return fmt::format( "BiarcList\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `BiarcList` object
+  //!
+  //!  \param stream the output stream
+  //!  \param CL     an instance of `BiarcList` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, BiarcList const & CL ) {
     for ( auto const & b : CL.m_biarc_list )

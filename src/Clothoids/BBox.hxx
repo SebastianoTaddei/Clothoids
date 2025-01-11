@@ -66,10 +66,10 @@ namespace G2lib {
     //!
     //! Construct a bounding box with additional information
     //!
-    //! \param[in] xmin x-minimimum box coordinate
-    //! \param[in] ymin y-minimimum box coordinate
-    //! \param[in] xmax x-maximum box coordinate
-    //! \param[in] ymax y-maximum box coordinate
+    //! \param[in] xmin \f$ x \f$-minimimum box coordinate
+    //! \param[in] ymin \f$ y \f$-minimimum box coordinate
+    //! \param[in] xmax \f$ x \f$-maximum box coordinate
+    //! \param[in] ymax \f$ y \f$-maximum box coordinate
     //! \param[in] id   identifier of the box
     //! \param[in] ipos ranking position of the box
     //!
@@ -109,9 +109,10 @@ namespace G2lib {
     //!
     //! Construct a bounding box with additional information
     //!
-    //! \param[in] bbox bbox [pmin, pmax]
-    //! \param[in] id   identifier of the box
-    //! \param[in] ipos ranking position of the box
+    //! \param[in] bbox_min bounding box lower corner
+    //! \param[in] bbox_max bounding box upper corner
+    //! \param[in] id       identifier of the box
+    //! \param[in] ipos     ranking position of the box
     //!
     BBox(
       real_type const bbox_min[2],
@@ -204,17 +205,17 @@ namespace G2lib {
     //!
     //! Pretty print a bbox
     //!
-    void
-    print( ostream_type & stream ) const {
-      fmt::print( stream,
-        "BBOX (xmin,ymin,xmax,ymax) = ( {}, {}, {}, {} )\n",
-        x_min(), y_min(), x_max(), y_max()
-      );
-    }
+    void print( ostream_type & stream ) const;
+
   };
 
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   //!
-  //! Pretty print a bbox
+  //!  Print on strem the `BBox` object
+  //!
+  //!  \param stream the output stream
+  //!  \param bb     an instance of `BBox` object
+  //!  \return the output stream
   //!
   inline
   ostream_type &

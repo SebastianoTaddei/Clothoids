@@ -18,6 +18,7 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 // Microsoft visual studio Workaround
 #ifdef max
@@ -35,6 +36,61 @@ namespace G2lib {
   using std::max;
   using std::min;
   using std::swap;
+
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  void
+  LineSegment::bb_triangles(
+    vector<Triangle2D> & tvec,
+    real_type            max_angle,
+    real_type            max_size,
+    integer              icurve
+  ) const {
+    real_type xmin, ymin, xmax, ymax;
+    this->bbox( xmin, ymin, xmax, ymax );
+    real_type xc = (xmax+xmin)/2;
+    real_type yc = (ymax+ymin)/2;
+    real_type nx = (ymax-ymin)/100;
+    real_type ny = (xmin-xmax)/100;
+    if ( xmax > xmin || ymax > ymin ) {
+      tvec.emplace_back( xmin, ymin, xmax, ymax, xc+nx, yc+ny, 0, 0, icurve );
+    } else {
+      UTILS_ERROR(
+        "LineSegment bb_triangles found a degenerate line\n"
+        "bbox = [ xmin={}, ymin={}, xmax={}, ymax={} ] max_angle={} max_size={}\n",
+        xmin, ymin, xmax, ymax, max_angle, max_size
+      );
+    }
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  void
+  LineSegment::bb_triangles_ISO(
+    real_type            offs,
+    vector<Triangle2D> & tvec,
+    real_type            max_angle,
+    real_type            max_size,
+    integer              icurve
+  ) const {
+    real_type xmin, ymin, xmax, ymax;
+    this->bbox_ISO( offs, xmin, ymin, xmax, ymax );
+    real_type xc = (xmax+xmin)/2;
+    real_type yc = (ymax+ymin)/2;
+    real_type nx = (ymax-ymin)/100;
+    real_type ny = (xmin-xmax)/100;
+    if ( xmax > xmin || ymax > ymin ) {
+      tvec.emplace_back( xmin, ymin, xmax, ymax, xc+nx, yc+ny, 0, 0, icurve );
+    } else {
+      UTILS_ERROR(
+        "LineSegment bb_triangles found a degenerate line\n"
+        "bbox = [ xmin={}, ymin={}, xmax={}, ymax={} ]\n"
+        "offs={} max_angle={} max_size={}\n",
+        xmin, ymin, xmax, ymax, offs, max_angle, max_size
+      );
+    }
+  }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -58,6 +114,7 @@ namespace G2lib {
   void LineSegment::build( BiarcList const & )      { UTILS_ERROR("can convert from BiarcList to LineSegment\n"); }
   void LineSegment::build( ClothoidList const & )   { UTILS_ERROR("can convert from ClothoidList to LineSegment\n"); }
   void LineSegment::build( Dubins const & )         { UTILS_ERROR("can convert from Dubins to LineSegment\n"); }
+  void LineSegment::build( Dubins3p const & )       { UTILS_ERROR("can convert from Dubins3p to LineSegment\n"); }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -82,6 +139,9 @@ namespace G2lib {
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //! Structure for line intersection
+  //!
   using L_struct = struct {
     real_type p[2];
     real_type q[2];
@@ -91,8 +151,15 @@ namespace G2lib {
   };
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  // Given three colinear points p, q, r, the function checks if
-  // point q lies on line segment 'pr'
+  //! Given three colinear points \f$ p \f$, \f$ q \f$, \f$ r \f$,
+  //! the function checks if point \f$ q \f$ lies on line segment \f$ \overline{pr} \f$.
+  //!
+  //! \param[in] p    first point \f$ p \f$
+  //! \param[in] q    point \f$ q \f$ to be checked
+  //! \param[in] r    second point \f$ r \f$
+  //! \param[in] epsi tolerance
+  //! \return `true` if \f$ q \f$ is on segment \f$ \overline{pr} \f$
+  //!
   static
   bool
   onSegment(
@@ -116,11 +183,18 @@ namespace G2lib {
     return ok;
   }
 
-  // To find orientation of ordered triplet (p, q, r).
-  // The function returns following values
-  // 0 --> p, q and r are collinear
-  // 1 --> Clockwise
-  // 2 --> Counterclockwise
+  //! To find orientation of ordered triplet (p, q, r).
+  //! The function returns following values
+  //!
+  //! - 0 --> p, q and r are collinear
+  //! - 1 --> Clockwise
+  //! - 2 --> Counterclockwise
+  //!
+  //! \param[in] p    first point \f$ p \f$
+  //! \param[in] q    second point \f$ q \f$
+  //! \param[in] r    third point \f$ r \f$
+  //! \param[in] epsi tolerance
+  //! \return the orientation
   static
   integer
   orientation(
@@ -341,7 +415,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  LineSegment::toNURBS( real_type * knots, real_type Poly[][3] ) const {
+  LineSegment::toNURBS( real_type knots[], real_type Poly[][3] ) const {
     knots[0] = knots[1] = 0;
     knots[2] = knots[3] = 1;
     Poly[0][0] = m_x0;
@@ -355,7 +429,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  LineSegment::toBS( real_type * knots, real_type Poly[2][2] ) const {
+  LineSegment::toBS( real_type knots[], real_type Poly[][2] ) const {
     knots[0] = knots[1] = 0;
     knots[2] = knots[3] = 1;
     Poly[0][0] = m_x0;
@@ -690,6 +764,18 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  LineSegment::info() const
+  { return fmt::format( "LineSegment\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `LineSegment` object
+  //!
+  //!  \param stream the output stream
+  //!  \param c      an instance of `LineSegment` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, LineSegment const & c ) {
     fmt::print( stream,

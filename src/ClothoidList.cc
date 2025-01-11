@@ -18,6 +18,8 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
+#include "Utils_Algo748.hh"
 
 #include <cfloat>
 #include <limits>
@@ -236,6 +238,9 @@ namespace G2lib {
     case CurveType::DUBINS:
       this->push_back( *static_cast<Dubins const *>(pC) );
       break;
+    case CurveType::DUBINS3P:
+      this->push_back( *static_cast<Dubins3p const *>(pC) );
+      break;
     //default:
     //  UTILS_ERROR(
     //    "ClothoidList::ClothoidList, missing conversion for type {}",
@@ -249,8 +254,15 @@ namespace G2lib {
   integer
   ClothoidList::find_at_s( real_type & s ) const {
     #ifdef CLOTHOIDS_USE_THREADS
-    bool ok;
-    integer & last_interval = *m_last_interval.search( std::this_thread::get_id(), ok );
+    std::unique_lock<std::mutex> lock(m_last_interval_mutex);
+    auto id = std::this_thread::get_id();
+    auto it = m_last_interval.find(id);
+    if ( it == m_last_interval.end() ) {
+      it = m_last_interval.insert( {id,std::make_shared<integer>()} ).first;
+      *it->second.get() = 0;
+    }
+    integer & last_interval{ *it->second.get() };
+    lock.unlock();
     #else
     integer & last_interval = m_last_interval;
     #endif
@@ -282,7 +294,6 @@ namespace G2lib {
   ClothoidList::init() {
     m_s0.clear();
     m_clothoid_list.clear();
-    this->reset_last_interval();
     m_aabb_done = false;
     m_aabb_triangles.clear();
     this->reset_last_interval();
@@ -481,6 +492,31 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
+  ClothoidList::push_back( Dubins3p const & c3p ) {
+    if ( m_clothoid_list.empty() ) m_s0.emplace_back( 0 );
+    CircleArc const & C0 = c3p.C0();
+    CircleArc const & C1 = c3p.C1();
+    CircleArc const & C2 = c3p.C2();
+    CircleArc const & C3 = c3p.C3();
+    CircleArc const & C4 = c3p.C4();
+    CircleArc const & C5 = c3p.C5();
+    m_s0.emplace_back( m_s0.back()+C0.length() );
+    m_s0.emplace_back( m_s0.back()+C1.length() );
+    m_s0.emplace_back( m_s0.back()+C2.length() );
+    m_s0.emplace_back( m_s0.back()+C3.length() );
+    m_s0.emplace_back( m_s0.back()+C4.length() );
+    m_s0.emplace_back( m_s0.back()+C5.length() );
+    m_clothoid_list.emplace_back( C0 );
+    m_clothoid_list.emplace_back( C1 );
+    m_clothoid_list.emplace_back( C2 );
+    m_clothoid_list.emplace_back( C3 );
+    m_clothoid_list.emplace_back( C4 );
+    m_clothoid_list.emplace_back( C5 );
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  void
   ClothoidList::push_back(
     real_type kappa0,
     real_type dkappa,
@@ -617,6 +653,60 @@ namespace G2lib {
       this->push_back(c);
     }
     return true;
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  bool
+  ClothoidList::smooth_quasi_G2(
+    integer     max_iter,
+    real_type   epsi,
+    real_type & max_dK
+  ) {
+
+    integer n{integer(m_clothoid_list.size())};
+
+    ClothoidCurve CL("smooth_quasi_G2-left"), CR("smooth_quasi_G2-right");
+
+    auto do_smooth = []( ClothoidCurve * CL, ClothoidCurve * CR ) -> real_type {
+      real_type theta0 = CL->theta_begin();
+      real_type x0     = CL->x_begin();
+      real_type y0     = CL->y_begin();
+      real_type theta1 = CL->theta_end();
+      real_type x1     = CL->x_end();
+      real_type y1     = CL->y_end();
+      real_type theta2 = CR->theta_end();
+      real_type x2     = CR->x_end();
+      real_type y2     = CR->y_end();
+      real_type dK     = CL->kappa_end()-CR->kappa_begin();
+      auto fun = [CL,CR,x0,y0,theta0,x1,y1,x2,y2,theta2]( real_type theta ) {
+        CL->build_G1( x0, y0, theta0, x1, y1, theta  );
+        CR->build_G1( x1, y1, theta,  x2, y2, theta2 );
+        return CL->kappa_end()-CR->kappa_begin();
+      };
+      Utils::Algo748<real_type> solver;
+      real_type theta = solver.eval2( theta1-Utils::m_pi/20,theta1+Utils::m_pi/20,-Utils::m_pi/2,Utils::m_pi/2,fun);
+      fun(theta);
+      return std::abs(dK);
+    };
+
+    for ( integer iter{0}; iter < max_iter; ++iter ) {
+      max_dK = 0;
+      for ( integer i{1}; i < n; i +=2 ) {
+        real_type dK = do_smooth( &m_clothoid_list[i-1], &m_clothoid_list[i] );
+        if ( dK > max_dK ) max_dK = dK;
+      }
+      for ( integer i{2}; i < n; i +=2 ) {
+        real_type dK = do_smooth( &m_clothoid_list[i-1], &m_clothoid_list[i] );
+        if ( dK > max_dK ) max_dK = dK;
+      }
+      if ( m_curve_is_closed ) {
+        real_type dK = do_smooth( &m_clothoid_list.front(), &m_clothoid_list.back() );
+        if ( dK > max_dK ) max_dK = dK;
+      }
+      if ( max_dK < epsi ) break;
+    }
+    return max_dK < epsi;
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2187,7 +2277,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  ClothoidList::get_SK( real_type * s, real_type * kappa ) const {
+  ClothoidList::get_SK( real_type s[], real_type kappa[] ) const {
     vector<ClothoidCurve>::const_iterator ic = m_clothoid_list.begin();
     integer   k{0};
     real_type ss{0};
@@ -2210,9 +2300,9 @@ namespace G2lib {
 
   void
   ClothoidList::get_STK(
-    real_type * s,
-    real_type * theta,
-    real_type * kappa
+    real_type s[],
+    real_type theta[],
+    real_type kappa[]
   ) const {
     vector<ClothoidCurve>::const_iterator ic = m_clothoid_list.begin();
     integer   k{0};
@@ -2234,7 +2324,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  ClothoidList::get_XY( real_type * x, real_type * y ) const {
+  ClothoidList::get_XY( real_type x[], real_type y[] ) const {
     vector<ClothoidCurve>::const_iterator ic = m_clothoid_list.begin();
     integer k{0};
     while ( ic != m_clothoid_list.end() ) {
@@ -2250,7 +2340,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  ClothoidList::get_delta_theta( real_type * delta_theta ) const {
+  ClothoidList::get_delta_theta( real_type delta_theta[] ) const {
     vector<ClothoidCurve>::const_iterator ic = m_clothoid_list.begin();
     integer k{0};
     for ( ++ic; ic != m_clothoid_list.end(); ++ic, ++k ) {
@@ -2264,7 +2354,7 @@ namespace G2lib {
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
-  ClothoidList::get_delta_kappa( real_type * deltaKappa ) const {
+  ClothoidList::get_delta_kappa( real_type deltaKappa[] ) const {
     vector<ClothoidCurve>::const_iterator ic = m_clothoid_list.begin();
     integer k{0};
     for ( ++ic; ic != m_clothoid_list.end(); ++ic, ++k  )
@@ -2388,7 +2478,13 @@ namespace G2lib {
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+  //!
+  //!  Print on strem the `ClothoidList` object
+  //!
+  //!  \param stream the output stream
+  //!  \param CL     an instance of `ClothoidList` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, ClothoidList const & CL ) {
     for ( auto const & C : CL.m_clothoid_list )
@@ -2487,6 +2583,12 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  ClothoidList::info() const
+  { return fmt::format( "ClothoidList\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   void
   G2solveCLC::save( ostream_type & stream ) const {
     stream << "# x y theta kappa\n";
@@ -2506,6 +2608,12 @@ namespace G2lib {
     save_segment( stream, m_S1 );
     stream << "# EOF\n";
   }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  string
+  ClothoidSplineG2::info() const
+  { return fmt::format( "ClothoidSplineG2\n{}\n", *this ); }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

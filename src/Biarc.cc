@@ -22,10 +22,31 @@
 ///
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 namespace G2lib {
 
   using std::abs;
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  Biarc::Biarc(
+    real_type x0,
+    real_type y0,
+    real_type theta0,
+    real_type x1,
+    real_type y1,
+    real_type theta1,
+    string const & name
+  ) : BaseCurve( name )
+  {
+    bool ok = build( x0, y0, theta0, x1, y1, theta1 );
+    UTILS_ASSERT(
+      ok,
+      "Biarc( x0={}, y0={}, theta0={}, x1={}, y1={}, theta1={}) cannot be computed\n",
+      x0, y0, theta0, x1, y1, theta1
+    );
+  }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -79,6 +100,7 @@ namespace G2lib {
   void Biarc::build( BiarcList const & )      { UTILS_ERROR("can convert from BiarcList to Biarc\n"); }
   void Biarc::build( ClothoidList const & )   { UTILS_ERROR("can convert from ClothoidList to Biarc\n"); }
   void Biarc::build( Dubins const & )         { UTILS_ERROR("can convert from Dubins to CircleArc\n"); }
+  void Biarc::build( Dubins3p const & )       { UTILS_ERROR("can convert from Dubins3p to CircleArc\n"); }
 
   /*\
    |   ____  _
@@ -975,6 +997,18 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  Biarc::info() const
+  { return fmt::format( "BiArc\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `Biarc` object
+  //!
+  //!  \param stream the output stream
+  //!  \param bi     an instance of `Biarc` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, Biarc const & bi ) {
     stream

@@ -9,4 +9,7 @@
 	url = https://github.com/ebertolazzi/cmake_utils.git
 [submodule "submodules/GenericContainer"]
 	path = submodules/GenericContainer
-	url = https://github.com/ebertolazzi/GenericContainer.git
+	url = git@github.com:ebertolazzi/GenericContainer.git
+[submodule "submodules/UtilsLite"]
+	path = submodules/UtilsLite
+	url = git@github.com:ebertolazzi/UtilsLite.git

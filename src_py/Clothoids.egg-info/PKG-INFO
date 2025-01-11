@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: Clothoids
-Version: 2.0.15.dev31+g2c9330d.d20241113
+Version: 2.0.24.dev0+gb744b9f2.d20250109
 Summary: G1 and G2 fitting with clothoids, spline of clothoids, circle arc and biarc.
 Author: Enrico Bertolazzi
 Description-Content-Type: text/markdown

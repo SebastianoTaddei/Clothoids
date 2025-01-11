@@ -20,10 +20,11 @@ addpath('../tests');
 
 DB_A = Dubins();
 DB_B = Dubins();
+DB3  = Dubins3p();
 
 k_max  = 0.6;
-d      = 3;
-x0     = -d;
+d      = 0.38;
+x0     = -2*d;
 y0     = 0;
 xM     = 0;
 yM     = 0.5*d;
@@ -36,6 +37,9 @@ DlenA  = [];
 DlenB  = [];
 kind   = [];
 epsilon = 1e-4;
+
+%DB3.build( x0, y0, theta0, xM, yM, xf, yf, thetaf, k_max, 'pattern' );
+DB3.build( x0, y0, theta0, xM, yM, xf, yf, thetaf, k_max, 'ellipse' );
 
 thetaGuess = (atan2(yM-y0,xM-x0) + atan2(yf-yM,xf-xM)) / 2;
 
@@ -51,8 +55,13 @@ thetaM0 = pattern_search(L);
 DB_A.build( x0, y0, theta0,  xM, yM, thetaM0, k_max );
 DB_B.build( xM, yM, thetaM0, xf, yf, thetaf,  k_max );
 
+angles_A = DB_A.get_range_angles_end( x0, y0, theta0,  xM, yM, k_max );
+angles_B = DB_B.get_range_angles_begin( xM, yM, xf, yf, thetaf,  k_max );
+angles   = DB3.get_range_angles( x0, y0, theta0, xM, yM, xf, yf, thetaf, k_max );
+
 figure();
-subplot(3,1,1);
+
+subplot(2,2,1);
 
 hold on;
 DB_A.plot();
@@ -60,6 +69,15 @@ DB_B.plot();
 plot([x0,xM,xf],[y0,yM,yf],'o','MarkerSize',15,'MarkerFaceColor','red');
 axis equal
 grid on
+
+subplot(2,2,2);
+
+hold on;
+DB3.plot();
+plot([x0,xM,xf],[y0,yM,yf],'o','MarkerSize',15,'MarkerFaceColor','red');
+axis equal
+grid on
+
 
 npts     = 1000;
 thetas   = linspace(thetaGuess-pi,thetaGuess+pi,npts);
@@ -77,7 +95,7 @@ IDX = find( abs(D_LAB_FD) > 5 );
 D_LAB_FD(IDX) = NaN;
 
 
-subplot(3,1,2);
+subplot(2,2,3);
 plot(thetas,LAB,'LineWidth',3);
 hold on
 plot(thetaGuess,L(thetaGuess),'o','MarkerSize',15,'MarkerFaceColor','magenta');
@@ -86,8 +104,12 @@ plot(thetaM0,L(thetaM0),'o','MarkerSize',15,'MarkerFaceColor','blue');
 plot(thetas(min_idx),min_tmp,'o','MarkerSize',10,'MarkerFaceColor','green');
 grid on
 
+for a=angles%[angles_A,angles_B]
+  plot([a,a],[10,25],'-','LineWidth',2);
+end
 
-subplot(3,1,3);
+
+subplot(2,2,4);
 plot(thetas,D_LAB,'LineWidth',3);
 hold on
 plot(thetas,D_LAB_FD,'LineWidth',2);
@@ -123,7 +145,7 @@ function thetaM0 = pattern_search( func )
   theta_max       = 2*pi;
   theta_min       = 0;
   theta_candidate = 0;
-  numpts          = 16;
+  numpts          = 8;
   delta_theta     = (theta_max - theta_min) / numpts;
   min_residual    = Inf;
   while delta_theta > 1e-16
@@ -140,4 +162,6 @@ function thetaM0 = pattern_search( func )
     delta_theta     = (theta_max - theta_min) / numpts;
   end
   thetaM0 = theta_candidate;
+  if thetaM0 >  pi; thetaM0 = thetaM0-2*pi; end
+  if thetaM0 < -pi; thetaM0 = thetaM0+2*pi; end
 end

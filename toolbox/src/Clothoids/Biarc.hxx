@@ -34,15 +34,8 @@ namespace G2lib {
   //!
   //! Compute biarc fitting by Hemite data
   //!
-  //! \rst
+  //! @html_image{biarc.png,width=60%}
   //!
-  //!   .. image:: ../../images/biarc.jpg
-  //!      :width: 80%
-  //!      :align: center
-  //!
-  //! \endrst
-  //!
-
   class Biarc : public BaseCurve {
     CircleArc m_C0{"Biarc_C0"};
     CircleArc m_C1{"Biarc_C1"};
@@ -79,15 +72,16 @@ namespace G2lib {
 
     //!
     //! Construct a biarc passing from the points
-    //! \f$ (x_0,y_0) \f$ to the point  \f$ (x_1,y_1) \f$
-    //! with initial angle \f$ \theta_0 \f$ and final angle \f$ \theta_1 \f$
+    //! \f$(x_0,y_0)\f$ to the point \f$(x_1,y_1)\f$
+    //! with initial angle \f$\theta_0\f$ and final angle \f$\theta_1\f$
     //!
-    //! \param[in] x0      \f$ x_0 \f$
-    //! \param[in] y0      \f$ y_0 \f$
+    //! \param[in] x0      \f$ x_0      \f$
+    //! \param[in] y0      \f$ y_0      \f$
     //! \param[in] theta0  \f$ \theta_0 \f$
-    //! \param[in] x1      \f$ x_1 \f$
-    //! \param[in] y1      \f$ y_1 \f$
+    //! \param[in] x1      \f$ x_1      \f$
+    //! \param[in] y1      \f$ y_1      \f$
     //! \param[in] theta1  \f$ \theta_1 \f$
+    //! \param[in] name    name of the biarc
     //!
     explicit
     Biarc(
@@ -98,15 +92,7 @@ namespace G2lib {
       real_type y1,
       real_type theta1,
       string const & name
-    ) : BaseCurve( name )
-    {
-      bool ok = build( x0, y0, theta0, x1, y1, theta1 );
-      UTILS_ASSERT(
-        ok,
-        "Biarc( x0={}, y0={}, theta0={}, x1={}, y1={}, theta1={}) cannot be computed\n",
-        x0, y0, theta0, x1, y1, theta1
-      );
-    }
+    );
 
     explicit
     Biarc( LineSegment const & LS ) : BaseCurve( LS.name() )
@@ -148,14 +134,14 @@ namespace G2lib {
 
     //!
     //! Construct a biarc passing from the points
-    //! \f$ (x_0,y_0) \f$ to the point  \f$ (x_1,y_1) \f$
+    //! \f$ (x_0,y_0) \f$ to the point \f$ (x_1,y_1) \f$
     //! with initial angle \f$ \theta_0 \f$ and final angle \f$ \theta_1 \f$
     //!
-    //! \param[in] x0      \f$ x_0 \f$
-    //! \param[in] y0      \f$ y_0 \f$
+    //! \param[in] x0      \f$ x_0      \f$
+    //! \param[in] y0      \f$ y_0      \f$
     //! \param[in] theta0  \f$ \theta_0 \f$
-    //! \param[in] x1      \f$ x_1 \f$
-    //! \param[in] y1      \f$ y_1 \f$
+    //! \param[in] x1      \f$ x_1      \f$
+    //! \param[in] y1      \f$ y_1      \f$
     //! \param[in] theta1  \f$ \theta_1 \f$
     //! \return false if biarc cannot be computed
     //!
@@ -201,6 +187,7 @@ namespace G2lib {
     void build( BiarcList const & );
     void build( ClothoidList const & );
     void build( Dubins const & );
+    void build( Dubins3p const & );
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -462,12 +449,12 @@ namespace G2lib {
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     //!
-    //! Return the x-coordinate of the juction point of the biarc.
+    //! Return the \f$x\f$-coordinate of the juction point of the biarc.
     //!
     real_type x_middle() const { return m_C1.x_begin(); }
 
     //!
-    //! Return the y-coordinate of the juction point of the biarc.
+    //! Return the \f$y\f$-coordinate of the juction point of the biarc.
     //!
     real_type y_middle() const { return m_C1.y_begin(); }
 
@@ -632,17 +619,12 @@ namespace G2lib {
       IntersectList   & ilist
     ) const override;
 
-    string
-    info() const
-    { return fmt::format( "BiArc\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const override
     { stream << this->info(); }
 
-    //!
-    //! Pretty print of the biarc.
-    //!
     friend
     ostream_type &
     operator << ( ostream_type & stream, Biarc const & bi );
@@ -660,8 +642,8 @@ namespace G2lib {
   //! build a guess of angles for a spline of biarc.
   //!
   //! \param[in]  n     number of points
-  //! \param[in]  x     x-coordinates
-  //! \param[in]  y     y-coordinates
+  //! \param[in]  x     \f$x\f$-coordinates
+  //! \param[in]  y     \f$y\f$-coordinates
   //! \param[out] theta guessed angles
   //!
   bool

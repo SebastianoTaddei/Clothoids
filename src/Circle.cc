@@ -18,6 +18,7 @@
 \*--------------------------------------------------------------------------*/
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 
 // Workaround for Visual Studio
 #ifdef min
@@ -80,6 +81,7 @@ namespace G2lib {
   void CircleArc::build( BiarcList const & )     { UTILS_ERROR("can convert from BiarcList to CircleArc\n"); }
   void CircleArc::build( ClothoidList const & )  { UTILS_ERROR("can convert from ClothoidList to CircleArc\n"); }
   void CircleArc::build( Dubins const & )        { UTILS_ERROR("can convert from Dubins to CircleArc\n"); }
+  void CircleArc::build( Dubins3p const & )      { UTILS_ERROR("can convert from Dubins3p to CircleArc\n"); }
 
   /*\
    |    ____ _          _         _
@@ -908,8 +910,8 @@ namespace G2lib {
 
   void
   CircleArc::toNURBS(
-    real_type * knots,
-    real_type   Poly[][3]
+    real_type knots[],
+    real_type Poly[][3]
   ) const {
 
     real_type dtheta = m_L*m_k;
@@ -977,6 +979,18 @@ namespace G2lib {
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  CircleArc::info() const
+  { return fmt::format( "CircleArc\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `CircleArc` object
+  //!
+  //!  \param stream the output stream
+  //!  \param c      an instance of `CircleArc` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, CircleArc const & c ) {
     fmt::print( stream,

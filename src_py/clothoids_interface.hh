@@ -15,9 +15,7 @@ private:
 public:
   ClothoidCurve(std::string const &name = "") : clothoid_curve{name} {}
 
-  ClothoidCurve(
-    double x0, double y0, double theta0, double k, double dk, double L, std::string const &name
-  )
+  ClothoidCurve(double x0, double y0, double theta0, double k, double dk, double L, std::string const &name)
       : clothoid_curve{x0, y0, theta0, k, dk, L, name}
   {
   }
@@ -27,9 +25,7 @@ public:
     this->clothoid_curve.build(x0, y0, theta0, k, dk, L);
   }
 
-  int build_G1(
-    double x0, double y0, double theta0, double x1, double y1, double theta1, double tol = 1e-12
-  )
+  int build_G1(double x0, double y0, double theta0, double x1, double y1, double theta1, double tol = 1e-12)
   {
     return this->clothoid_curve.build_G1(x0, y0, theta0, x1, y1, theta1, tol);
   }
@@ -82,12 +78,14 @@ public:
     return this->clothoid_list.build_G1(x.size(), x.data(), y.data());
   }
 
+  bool
+  build_G1(std::vector<double> const &x, std::vector<double> const &y, std::vector<double> const &theta)
+  {
+    return this->clothoid_list.build_G1(x.size(), x.data(), y.data(), theta.data());
+  }
+
   bool build(
-    const double &x0,
-    const double &y0,
-    const double &theta0,
-    std::vector<double> const &s,
-    std::vector<double> const &kappa
+    const double &x0, const double &y0, const double &theta0, std::vector<double> const &s, std::vector<double> const &kappa
   )
   {
     return this->clothoid_list.build(x0, y0, theta0, s, kappa);
@@ -100,6 +98,22 @@ public:
     double x, y;
     this->clothoid_list.eval(s, x, y);
     return {x, y};
+  }
+
+  std::pair<std::vector<double>, std::vector<double>> eval(std::vector<double> const &s)
+  {
+    std::vector<double> x, y;
+    x.reserve(s.size());
+    y.reserve(s.size());
+    for (size_t i{0}; i <= s.size(); i++)
+    {
+      double _x, _y;
+      this->clothoid_list.eval(s[i], _x, _y);
+      x.push_back(_x);
+      y.push_back(_y);
+    }
+
+    return std::make_pair(std::move(x), std::move(y));
   }
 
   std::vector<double> evaluate(const double &s)

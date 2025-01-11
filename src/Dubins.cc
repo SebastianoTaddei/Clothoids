@@ -22,11 +22,13 @@
 ///
 
 #include "Clothoids.hh"
+#include "Clothoids_fmt.hh"
 #include "PolynomialRoots.hh"
 
 namespace G2lib {
 
   using PolynomialRoots::Quadratic;
+  using PolynomialRoots::Quartic;
 
   /*\
    |   ____        _     _
@@ -48,6 +50,22 @@ namespace G2lib {
   minus_pi_pi( real_type & a ) {
     while ( a < -Utils::m_pi ) a += Utils::m_2pi;
     while ( a >  Utils::m_pi ) a -= Utils::m_2pi;
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  integer
+  to_integer( DubinsType d ) {
+    switch ( d ) {
+    case DubinsType::LSL: return 0;
+    case DubinsType::RSR: return 1;
+    case DubinsType::LSR: return 2;
+    case DubinsType::RSL: return 3;
+    case DubinsType::LRL: return 4;
+    case DubinsType::RLR: return 5;
+    default: break;
+    }
+    return 6;
   }
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,6 +94,7 @@ namespace G2lib {
   void Dubins::build( PolyLine const & )      { UTILS_ERROR("can convert from PolyLine to Dubins\n"); }
   void Dubins::build( BiarcList const & )     { UTILS_ERROR("can convert from BiarcList to Dubins\n"); }
   void Dubins::build( ClothoidList const & )  { UTILS_ERROR("can convert from ClothoidList to Dubins\n"); }
+  void Dubins::build( Dubins3p const & )      { UTILS_ERROR("can convert from Dubins3p to Dubins\n"); }
 
   void
   Dubins::build( Dubins const & DB ) {
@@ -85,6 +104,34 @@ namespace G2lib {
     m_solution_type = DB.m_solution_type;
   }
 
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //! Given two points
+  //!
+  //! \f[ (x_0,y_0),\qquad (x_3,y_3) \f]
+  //!
+  //! two angles
+  //!
+  //! \f[ \theta_0,\qquad \theta_1 \f]
+  //!
+  //! and a maximum of curvature \f$ \kappa_{\max} \f$
+  //!
+  //! compute the solution of the Dubins problem
+  //!
+  //! \param[in]  x0     coordinate \f$ x_0 \f$
+  //! \param[in]  y0     coordinate \f$ y_0 \f$
+  //! \param[in]  theta0 angle \f$ \theta_0 \f$
+  //! \param[in]  x3     coordinate \f$ x_3 \f$
+  //! \param[in]  y3     coordinate \f$ y_3 \f$
+  //! \param[in]  theta3 angle \f$ \theta_3 \f$
+  //! \param[in]  k_max  max curvature \f$ \kappa_{\max} \f$
+  //! \param[out] type   solution type
+  //! \param[out] L1     length of first arc
+  //! \param[out] L2     length of second arc
+  //! \param[out] L3     length of third arc
+  //! \param[out] grad   gradient of the solution respect to initial and final angle
+  //! \return `true` if a solution is found
+  //!
   bool
   Dubins_build(
     real_type    x0,
@@ -504,6 +551,13 @@ return m_C2.FUN(s)
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   void
+  Dubins::trim( real_type, real_type ) {
+    UTILS_ERROR0( "Dubins::trim not defined, convert to ClothoidList to trim the curve!");
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  void
   Dubins::bbox(
     real_type & xmin,
     real_type & ymin,
@@ -842,6 +896,248 @@ return m_C2.FUN(s)
 
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  string
+  Dubins::info() const
+  { return fmt::format( "Dubins\n{}\n", *this ); }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  string
+  Dubins::solution_type_string() const {
+    return to_string( m_solution_type );
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  string
+  Dubins::solution_type_string_short() const {
+    string tmp{to_string( m_solution_type )};
+    string res{""};
+    if ( m_C0.length() > 0 ) res += tmp[0];
+    if ( m_C1.length() > 0 ) res += tmp[1];
+    if ( m_C2.length() > 0 ) res += tmp[2];
+    return res;
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  #define OFFSET_ROOT \
+  real_type p, dp;    \
+  Q.eval( x, p, dp ); \
+  x += 1e-4 * (dp > 0?1:-1)
+
+  integer
+  Dubins::get_range_angles_begin(
+    real_type x0,
+    real_type y0,
+    real_type x1,
+    real_type y1,
+    real_type theta1,
+    real_type k_max,
+    real_type angles[]
+  ) const {
+
+    // setup in standard form
+    real_type dx   { x1 - x0 };
+    real_type dy   { y1 - y0 };
+    real_type th   { atan2( dy, dx ) };
+    real_type beta { theta1 - th };
+    real_type d    { k_max * hypot( dx, dy ) };
+
+    // metto angolo in -Pi, Pi
+    minus_pi_pi( beta );
+
+    integer npts{0};
+    real_type sb{sin(beta)};
+    real_type cb{cos(beta)};
+
+    { // case CCC
+      real_type b2  { 2 * beta };
+      real_type t3  { sin(b2) };
+      real_type t2  { cos(b2) };
+      real_type t7  { d * d  };
+      real_type t8  { t7 * sb };
+      real_type t9  { cb * d  };
+      real_type t10 { 24  };
+      real_type t11 { (10-t7) * t7  };
+      real_type t12 { 2*t2 * (1-t7) };
+      real_type t14 { 8 };
+      real_type t15 { 16 * cb };
+      real_type t16 { (t10 * t7 - 48) * sb };
+
+      real_type s_x_d[2]{d,-d};
+      for ( integer i{0}; i < 2; ++i ) {
+
+        real_type t5  { s_x_d[i] };
+        real_type t6  { t5 * sb };
+        real_type t13 { t5 * (t2-t7) };
+
+        real_type A { -t10 * (t6 - cb) + 4* ((t8+t3) * t5 - d*t9) + 26 + t11 - t12 };
+        real_type B { t14 * (t13 + t3) + t16 + t5 * (40-t15) };
+        real_type C { (t14 * t7 - 16) * sb * t5 - 2 * (d*d) * t7 + 12*t2 + 4*t7 * (t2 + 1) + 52 };
+        real_type D { t14 * (t13 - t3) + t16 + t5 * (t15 + 40) };
+        real_type E { -t10 * (t6 + cb) - 4* ((t3-t8) * t5 - d*t9) + 26 + t11 - t12 };
+
+        bool reciprocal{ std::abs(A) >= std::abs(E) };
+        if ( reciprocal ) {
+          std::swap( A, E );
+          std::swap( B, D );
+        }
+        Quartic Q( A, B, C, D, E );
+        real_type X[4];
+        integer nr{ Q.get_real_roots( X ) };
+        for ( integer ir{0}; ir < nr; ++ir ) {
+          // convert to angle
+          real_type y{ X[ir] };
+          real_type x{ 1     };
+          if ( reciprocal ) std::swap( y, x );
+          real_type theta{ 2*atan2(y,x)+th };
+          minus_pi_pi( theta );
+          angles[npts++] = theta;
+        }
+      }
+    }
+    { // case CSC+
+      real_type t{ d*d/2-1 };
+      real_type s_x_d[2]{d,-d};
+      for ( integer i{0}; i < 2; ++i ) {
+        real_type tmp { s_x_d[i]*sb + t };
+        real_type A   { tmp - cb        };
+        real_type B   { 2*(s_x_d[i]+sb) };
+        real_type C   { tmp + cb        };
+
+        bool reciprocal{ std::abs(A) >= std::abs(C) };
+        if ( reciprocal ) std::swap( A, C );
+
+        Quadratic Q( A, B, C );
+        real_type X[2];
+        integer nr{ Q.get_real_roots( X ) };
+        for ( integer ir{0}; ir < nr; ++ir ) {
+          // convert to angle
+          real_type y{ X[ir] };
+          real_type x{ 1     };
+          if ( reciprocal ) std::swap( y, x );
+          real_type theta{ 2*atan2(y,x)+th };
+          minus_pi_pi( theta );
+          angles[npts++] = theta;
+        }
+      }
+    }
+    return npts;
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  integer
+  Dubins::get_range_angles_end(
+    real_type x0,
+    real_type y0,
+    real_type theta0,
+    real_type x1,
+    real_type y1,
+    real_type k_max,
+    real_type angles[]
+  ) const {
+
+    // setup in standard form
+    real_type dx    { x1 - x0 };
+    real_type dy    { y1 - y0 };
+    real_type th    { atan2( dy, dx ) };
+    real_type alpha { theta0 - th };
+    real_type d     { k_max * hypot( dx, dy ) };
+
+    // metto angolo in -Pi, Pi
+    minus_pi_pi( alpha );
+
+    integer npts{0};
+    real_type sa{sin(alpha)};
+    real_type ca{cos(alpha)};
+
+    { // case CCC
+      real_type a2  { 2*alpha };
+      real_type t3  { sin(a2) };
+      real_type t2  { cos(a2) };
+      real_type t5  { d * d   };
+      real_type t6  { t5 * sa };
+      real_type t7  { ca * d  };
+      real_type t10 { 24 };
+      real_type t11 { (10-t5) * t5 };
+      real_type t12 { 2*t2 * (1 - t5) };
+      real_type t14 { -8 };
+      real_type t15 { 16 * ca };
+      real_type t16 { (t10 * t5 - 48) * sa };
+
+      real_type s_x_d[2]{d,-d};
+      for ( integer i{0}; i < 2; ++i ) {
+
+        real_type t8  { s_x_d[i]     };
+        real_type t9  { t8 * sa      };
+        real_type t13 { t8 * (t2-t5) };
+
+        real_type A { t10 * (t9 + ca) + t11 - t12 - 4 * ((t6 + t3) * t8 + d*t7) + 26 };
+        real_type B { t14 * (t13 - t3) + t16 + t8 * (t15 - 40) };
+        real_type C { -2*(d*d) * t5 + (t14 * t5 + 16) * sa * t8 + 12 * t2 + 4*t5 * (t2 + 1) + 52 };
+        real_type D { t14 * (t13 + t3) + t16 + t8 * (-t15 - 40) };
+        real_type E { t10 * (t9 - ca) + t11 - t12 - 4 * ((t6 - t3) * t8 - d*t7) + 26 };
+
+        bool reciprocal{ std::abs(A) >= std::abs(E) };
+        if ( reciprocal ) {
+          std::swap( A, E );
+          std::swap( B, D );
+        }
+
+        Quartic Q( A, B, C, D, E );
+        real_type X[4];
+        integer nr{ Q.get_real_roots( X ) };
+        for ( integer ir{0}; ir < nr; ++ir ) {
+          // convert to angle
+          real_type y{ X[ir] };
+          real_type x{ 1     };
+          if ( reciprocal ) std::swap( y, x );
+          real_type theta{ 2*atan2(y,x)+th };
+          minus_pi_pi( theta );
+          angles[npts++] = theta;
+        }
+      }
+    }
+    { // case CSC+
+      real_type t{ d*d/2-1 };
+      real_type s_x_d[2]{d,-d};
+      for ( integer i{0}; i < 2; ++i ) {
+
+        real_type tmp { s_x_d[i]*sa + t };
+        real_type A   { tmp - ca        };
+        real_type B   { 2*(s_x_d[i]+sa) };
+        real_type C   { tmp + ca        };
+
+        bool reciprocal{ std::abs(A) >= std::abs(C) };
+        if ( reciprocal ) std::swap( A, C );
+
+        Quadratic Q( A, B, C );
+        real_type X[2];
+        integer nr{ Q.get_real_roots( X ) };
+        for ( integer ir{0}; ir < nr; ++ir ) {
+          // convert to angle
+          real_type y{ X[ir] };
+          real_type x{ 1     };
+          if ( reciprocal ) std::swap( y, x );
+          real_type theta{ 2*atan2(y,x)+th };
+          minus_pi_pi( theta );
+          angles[npts++] = theta;
+        }
+      }
+    }
+    return npts;
+  }
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //!
+  //!  Print on strem the `Dubins` object
+  //!
+  //!  \param stream the output stream
+  //!  \param bi     an instance of `Dubins` object
+  //!  \return the output stream
+  //!
   ostream_type &
   operator << ( ostream_type & stream, Dubins const & bi ) {
     stream

@@ -31,8 +31,26 @@ namespace G2lib {
    |  |____/ \__,_|_.__/|_|_| |_|___/
   \*/
 
+  //!
+  //! Type of Dubins solution
+  //!
+  //! - LSL left-stright-left solution
+  //! - RSR right-stright-right solution
+  //! - LSR left-stright-right solution
+  //! - RSL right-stright-left solution
+  //! - LRL left-right-left solution
+  //! - RLR right-left-right solution
+  //!
   using DubinsType = enum class DubinsType : integer
   { LSL, RSR, LSR, RSL, LRL, RLR, DUBINS_ERROR };
+
+  //!
+  //! Convert Dubins type solution to an integer.
+  //!
+  //! \param d type of curve
+  //! \return a number from `0` to `5`
+  //!
+  integer to_integer( DubinsType d );
 
   bool
   Dubins_build(
@@ -51,7 +69,7 @@ namespace G2lib {
   );
 
   //!
-  //! Class to manage a circle arc
+  //! Class to manage a Dubins curve
   //!
   class Dubins : public BaseCurve {
   private:
@@ -83,13 +101,14 @@ namespace G2lib {
     //!
     //! Construct a Dubins solution
     //!
-    //! \param[in] x0     initial position x-coordinate
-    //! \param[in] y0     initial position y-coordinate
+    //! \param[in] x0     initial position \f$x\f$-coordinate
+    //! \param[in] y0     initial position \f$y\f$-coordinate
     //! \param[in] theta0 initial angle
-    //! \param[in] x1     final position x-coordinate
-    //! \param[in] y1     final position y-coordinate
+    //! \param[in] x1     final position \f$x\f$-coordinate
+    //! \param[in] y1     final position \f$y\f$-coordinate
     //! \param[in] theta1 final angle
-    //! \param[in] kmax   max curvature
+    //! \param[in] k_max  max curvature
+    //! \param[in] name   name of the Dubins object
     //!
     explicit
     Dubins(
@@ -110,22 +129,25 @@ namespace G2lib {
     //!
     void
     copy( Dubins const & d ) {
-      m_C0 = d.m_C0;
-      m_C1 = d.m_C1;
-      m_C2 = d.m_C2;
+      m_C0            = d.m_C0;
+      m_C1            = d.m_C1;
+      m_C2            = d.m_C2;
+      m_length        = d.m_length;
+      m_length_Dalpha = d.m_length_Dalpha;
+      m_length_Dbeta  = d.m_length_Dbeta;
       m_solution_type = d.m_solution_type;
     }
 
     //!
     //! Construct a Dubins solution
     //!
-    //! \param[in] x0     initial position x-coordinate
-    //! \param[in] y0     initial position y-coordinate
+    //! \param[in] x0     initial position \f$x\f$-coordinate
+    //! \param[in] y0     initial position \f$y\f$-coordinate
     //! \param[in] theta0 initial angle
-    //! \param[in] x1     final position x-coordinate
-    //! \param[in] y1     final position y-coordinate
+    //! \param[in] x1     final position \f$x\f$-coordinate
+    //! \param[in] y1     final position \f$y\f$-coordinate
     //! \param[in] theta1 final angle
-    //! \param[in] kmax   max curvature
+    //! \param[in] k_max  max curvature
     //!
     bool
     build(
@@ -138,6 +160,52 @@ namespace G2lib {
       real_type k_max
     );
 
+    //!
+    //! Construct a Dubins solution
+    //!
+    //! \param[in]  x0     initial position \f$x\f$-coordinate
+    //! \param[in]  y0     initial position \f$y\f$-coordinate
+    //! \param[in]  x1     final position \f$x\f$-coordinate
+    //! \param[in]  y1     final position \f$y\f$-coordinate
+    //! \param[in]  theta1 final angle
+    //! \param[in]  k_max  max curvature
+    //! \param[out] angles range points
+    //! \return     number of range points
+    //!
+    integer
+    get_range_angles_begin(
+      real_type x0,
+      real_type y0,
+      real_type x1,
+      real_type y1,
+      real_type theta1,
+      real_type k_max,
+      real_type angles[]
+    ) const;
+
+    //!
+    //! Construct a Dubins solution
+    //!
+    //! \param[in]  x0     initial position \f$x\f$-coordinate
+    //! \param[in]  y0     initial position \f$y\f$-coordinate
+    //! \param[in]  theta0 initial angle
+    //! \param[in]  x1     final position \f$x\f$-coordinate
+    //! \param[in]  y1     final position \f$y\f$-coordinate
+    //! \param[in]  k_max  max curvature
+    //! \param[out] angles range points
+    //! \return     number of range points
+    //!
+    integer
+    get_range_angles_end(
+      real_type x0,
+      real_type y0,
+      real_type theta0,
+      real_type x1,
+      real_type y1,
+      real_type k_max,
+      real_type angles[]
+    ) const;
+
     void build( LineSegment const & L );
     void build( CircleArc const & C );
     void build( ClothoidCurve const & );
@@ -146,6 +214,7 @@ namespace G2lib {
     void build( PolyLine const & );
     void build( ClothoidList const & );
     void build( Dubins const & );
+    void build( Dubins3p const & );
 
     void
     bbox(
@@ -188,7 +257,9 @@ namespace G2lib {
       CL.push_back( m_C2 );
     }
 
-    real_type length() const override { return m_length; }
+    real_type length()        const override { return m_length; }
+    real_type length_Dalpha() const          { return m_length_Dalpha; }
+    real_type length_Dbeta()  const          { return m_length_Dbeta; }
     real_type length_ISO( real_type offs ) const override;
 
     void
@@ -198,6 +269,11 @@ namespace G2lib {
     }
 
     DubinsType solution_type() const { return m_solution_type; }
+
+    string solution_type_string() const;
+    string solution_type_string_short() const;
+
+    integer icode() const { return to_integer(m_solution_type); }
 
     real_type length0() const { return m_C0.length(); }
     real_type length1() const { return m_C1.length(); }
@@ -222,16 +298,27 @@ namespace G2lib {
 
     real_type theta_begin()  const override { return m_C0.theta_begin(); }
     real_type theta_end()    const override { return m_C2.theta_end(); }
+
     real_type kappa_begin()  const override { return m_C0.kappa_begin(); }
     real_type kappa_end()    const override { return m_C2.kappa_end(); }
+
     real_type x_begin()      const override { return m_C0.x_begin(); }
-    real_type y_begin()      const override { return m_C0.y_begin(); }
     real_type x_end()        const override { return m_C2.x_end(); }
+
+    real_type y_begin()      const override { return m_C0.y_begin(); }
     real_type y_end()        const override { return m_C2.y_end(); }
+
     real_type tx_begin()     const override { return m_C0.tx_begin(); }
+    real_type tx_end()       const override { return m_C2.tx_end(); }
+
     real_type ty_begin()     const override { return m_C0.ty_begin(); }
+    real_type ty_end()       const override { return m_C2.ty_end(); }
+
     real_type nx_begin_ISO() const override { return m_C0.nx_begin_ISO(); }
+    real_type nx_end_ISO()   const override { return m_C2.nx_end_ISO(); }
+
     real_type ny_begin_ISO() const override { return m_C0.ny_begin_ISO(); }
+    real_type ny_end_ISO()   const override { return m_C2.ny_end_ISO(); }
 
     real_type theta0_begin() const { return m_C0.theta_begin(); }
     real_type theta0_end()   const { return m_C0.theta_end(); }
@@ -243,18 +330,21 @@ namespace G2lib {
     real_type theta2_end()   const { return m_C2.theta_end(); }
 
     real_type x0_begin() const { return m_C0.x_begin(); }
-    real_type y0_begin() const { return m_C0.y_begin(); }
     real_type x0_end()   const { return m_C0.x_end(); }
+
+    real_type y0_begin() const { return m_C0.y_begin(); }
     real_type y0_end()   const { return m_C0.y_end(); }
 
     real_type x1_begin() const { return m_C1.x_begin(); }
-    real_type y1_begin() const { return m_C1.y_begin(); }
     real_type x1_end()   const { return m_C1.x_end(); }
+
+    real_type y1_begin() const { return m_C1.y_begin(); }
     real_type y1_end()   const { return m_C1.y_end(); }
 
     real_type x2_begin() const { return m_C2.x_begin(); }
-    real_type y2_begin() const { return m_C2.y_begin(); }
     real_type x2_end()   const { return m_C2.x_end(); }
+
+    real_type y2_begin() const { return m_C2.y_begin(); }
     real_type y2_end()   const { return m_C2.y_end(); }
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -296,10 +386,7 @@ namespace G2lib {
 
     void change_origin( real_type newx0, real_type newy0 ) override;
 
-    void
-    trim( real_type, real_type ) override {
-      UTILS_ERROR0( "Dubins::trim not defined, convert to ClothoidList to trim the curve!");
-    }
+    void trim( real_type, real_type ) override;
 
     void scale( real_type s ) override;
 
@@ -529,25 +616,25 @@ namespace G2lib {
       IntersectList   & ilist
     ) const override;
 
-    string
-    info() const
-    { return fmt::format( "Dubins\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const override
     { stream << this->info(); }
 
-    //!
-    //! Pretty print of Dubins class.
-    //!
     friend
     ostream_type &
     operator << ( ostream_type & stream, Dubins const & bi );
 
     CurveType type() const override { return CurveType::DUBINS; }
 
+    friend class Dubins3p;
   };
 
+  //!
+  //! \param[in] n Dubins type solution
+  //! \return  the string with the name of the solution
+  //!
   inline
   string
   to_string( DubinsType n ) {
@@ -563,6 +650,7 @@ namespace G2lib {
     }
     return res;
   };
+
 }
 
 ///

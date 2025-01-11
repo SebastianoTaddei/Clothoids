@@ -39,8 +39,8 @@ namespace G2lib {
     friend class CircleArc;
     friend class PolyLine;
 
-    real_type m_x0{0};     //!< initial x coordinate of the line
-    real_type m_y0{0};     //!< initial y coordinate of the line
+    real_type m_x0{0};     //!< initial \f$x\f$-coordinate of the line
+    real_type m_y0{0};     //!< initial \f$y\f$-coordinate of the line
     real_type m_theta0{0}; //!< angle of the line
 
     real_type m_c0{1};     //!< `cos(theta0)`
@@ -144,23 +144,7 @@ namespace G2lib {
       real_type            max_angle = Utils::m_pi/6, // 30 degree
       real_type            max_size  = 1e100, // unused
       integer              icurve    = 0
-    ) const override {
-      real_type xmin, ymin, xmax, ymax;
-      this->bbox( xmin, ymin, xmax, ymax );
-      real_type xc = (xmax+xmin)/2;
-      real_type yc = (ymax+ymin)/2;
-      real_type nx = (ymax-ymin)/100;
-      real_type ny = (xmin-xmax)/100;
-      if ( xmax > xmin || ymax > ymin ) {
-        tvec.emplace_back( xmin, ymin, xmax, ymax, xc+nx, yc+ny, 0, 0, icurve );
-      } else {
-        UTILS_ERROR(
-          "LineSegment bb_triangles found a degenerate line\n"
-          "bbox = [ xmin={}, ymin={}, xmax={}, ymax={} ] max_angle={} max_size={}\n",
-          xmin, ymin, xmax, ymax, max_angle, max_size
-        );
-      }
-    }
+    ) const override;
 
     void
     bb_triangles_ISO(
@@ -169,24 +153,7 @@ namespace G2lib {
       real_type            max_angle = Utils::m_pi/6, // 30 degree
       real_type            max_size  = 1e100, // unused
       integer              icurve    = 0
-    ) const override {
-      real_type xmin, ymin, xmax, ymax;
-      this->bbox_ISO( offs, xmin, ymin, xmax, ymax );
-      real_type xc = (xmax+xmin)/2;
-      real_type yc = (ymax+ymin)/2;
-      real_type nx = (ymax-ymin)/100;
-      real_type ny = (xmin-xmax)/100;
-      if ( xmax > xmin || ymax > ymin ) {
-        tvec.emplace_back( xmin, ymin, xmax, ymax, xc+nx, yc+ny, 0, 0, icurve );
-      } else {
-        UTILS_ERROR(
-          "LineSegment bb_triangles found a degenerate line\n"
-          "bbox = [ xmin={}, ymin={}, xmax={}, ymax={} ]\n"
-          "offs={} max_angle={} max_size={}\n",
-          xmin, ymin, xmax, ymax, offs, max_angle, max_size
-        );
-      }
-    }
+    ) const override;
 
     void
     bb_triangles_SAE(
@@ -472,10 +439,10 @@ namespace G2lib {
     //!
     //! Compute the point at minimum distance from a point `[x,y]` and the line segment
     //!
-    //! \param[in]  qx  x-coordinate
-    //! \param[in]  qy  y-coordinate
-    //! \param[out] x   x-coordinate of the closest point
-    //! \param[out] y   y-coordinate of the closest point
+    //! \param[in]  qx  \f$x\f$-coordinate
+    //! \param[in]  qy  \f$y\f$-coordinate
+    //! \param[out] x   \f$x\f$-coordinate of the closest point
+    //! \param[out] y   \f$y\f$-coordinate of the closest point
     //! \param[out] s   param of the closest point
     //! \param[out] t   signed distance if projection is orthogonal to segment
     //! \param[out] dst signed distance from the segment
@@ -507,9 +474,7 @@ namespace G2lib {
       real_type & dst
     ) const override;
 
-    string
-    info() const
-    { return fmt::format( "LineSegment\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const override
@@ -572,6 +537,7 @@ namespace G2lib {
     void build( BiarcList const & );
     void build( ClothoidList const & );
     void build( Dubins const & );
+    void build( Dubins3p const & );
 
     /*
     //             _ _ _     _
@@ -665,11 +631,11 @@ namespace G2lib {
     paramNURBS( integer & n_knots, integer & n_pnts ) const;
 
     void
-    toNURBS( real_type * knots, real_type Poly[][3] ) const;
+    toNURBS( real_type knots[], real_type Poly[][3] ) const;
 
     virtual
     void
-    toBS( real_type * knots, real_type Poly[][2] ) const;
+    toBS( real_type knots[], real_type Poly[][2] ) const;
 
     friend class ClothoidCurve;
 

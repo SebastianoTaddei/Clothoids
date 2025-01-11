@@ -49,7 +49,8 @@ namespace G2lib {
     real_type           m_ye;
 
     #ifdef CLOTHOIDS_USE_THREADS
-    mutable Utils::BinarySearch<integer> m_last_interval;
+    mutable std::mutex                                         m_last_interval_mutex;
+    mutable std::map<std::thread::id,std::shared_ptr<integer>> m_last_interval;
     #else
     mutable integer m_last_interval{0};
     #endif
@@ -64,8 +65,11 @@ namespace G2lib {
     void
     reset_last_interval() {
       #ifdef CLOTHOIDS_USE_THREADS
-      bool ok;
-      integer & last_interval = *m_last_interval.search( std::this_thread::get_id(), ok );
+      std::unique_lock<std::mutex> lock(m_last_interval_mutex);
+      auto id = std::this_thread::get_id();
+      auto it = m_last_interval.find(id);
+      if ( it == m_last_interval.end() ) it = m_last_interval.insert( {id,std::make_shared<integer>()} ).first;
+      integer & last_interval{ *it->second.get() };
       #else
       integer & last_interval = m_last_interval;
       #endif
@@ -144,6 +148,7 @@ namespace G2lib {
     void build( PolyLine const & );
     void build( ClothoidList const & );
     void build( Dubins const & );
+    void build( Dubins3p const & );
 
     void
     bbox(
@@ -160,9 +165,7 @@ namespace G2lib {
       real_type & /* ymin */,
       real_type & /* xmax */,
       real_type & /* ymax */
-    ) const override {
-      UTILS_ERROR0( "PolyLine::bbox( offs ... ) not available!\n" );
-    }
+    ) const override;
 
     /*\
      |  _    _   _____    _                _
@@ -387,10 +390,10 @@ namespace G2lib {
     //!
     //! Compute the point at minimum distance from a point `[x,y]` and the line segment
     //!
-    //! \param[in]  x   x-coordinate
-    //! \param[in]  y   y-coordinate
-    //! \param[out] X   x-coordinate of the closest point
-    //! \param[out] Y   y-coordinate of the closest point
+    //! \param[in]  x   \f$x\f$-coordinate
+    //! \param[in]  y   \f$y\f$-coordinate
+    //! \param[out] X   \f$x\f$-coordinate of the closest point
+    //! \param[out] Y   \f$y\f$-coordinate of the closest point
     //! \param[out] S   s-param of the closest point
     //! \param[out] T   t-param of the closest point
     //! \param[out] DST the distance point-segment
@@ -417,9 +420,7 @@ namespace G2lib {
       real_type & /* S    */,
       real_type & /* T    */,
       real_type & /* DST  */
-    ) const override {
-      UTILS_ERROR( "PolyLine::closest_point_ISO( ... offs ... ) not available!\n" );
-    }
+    ) const override;
 
     /*\
      |             _ _ _     _
@@ -437,13 +438,7 @@ namespace G2lib {
       real_type        offs,
       PolyLine const & CL,
       real_type        offs_CL
-    ) const {
-      UTILS_ASSERT0(
-        Utils::is_zero(offs) && Utils::is_zero(offs_CL),
-        "PolyLine::collision( offs ... ) not available!\n"
-      );
-      return this->collision( CL );
-    }
+    ) const;
 
     bool
     collision( BaseCurve const * pC ) const override;
@@ -503,13 +498,7 @@ namespace G2lib {
       PolyLine const & pl,
       real_type        offs_pl,
       IntersectList  & ilist
-    ) const {
-      UTILS_ASSERT0(
-        Utils::is_zero(offs) && Utils::is_zero(offs_pl),
-        "PolyLine::intersect( offs ... ) not available!\n"
-      );
-      this->intersect( pl, ilist );
-    }
+    ) const;
 
     void
     intersect(
@@ -525,9 +514,7 @@ namespace G2lib {
       IntersectList   & ilist
     ) const override;
 
-    string
-    info() const
-    { return fmt::format( "PolyLine\n{}\n", *this ); }
+    string info() const;
 
     void
     info( ostream_type & stream ) const override
