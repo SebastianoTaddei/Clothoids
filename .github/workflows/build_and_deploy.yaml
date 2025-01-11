@@ -71,7 +71,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
             pip install ninja &&
-            yum install -y ruby &&
+            yum install -y rh-ruby26 &&
+            source /opt/rh/rh-ruby26/enable &&
             gem install colorize &&
             gem install rubyzip &&
             gem install rake &&
