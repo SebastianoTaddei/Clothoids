@@ -50,3 +50,10 @@ cmake-build-debug
 toolbox/CMakeFiles
 Xcode
 *.csv
+*.egg-info
+*.so
+Clothoids_wrap.cpp
+Clothoids.py
+CMakeLists-Flags.txt
+.cache/
+
