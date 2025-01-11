@@ -50,3 +50,8 @@ cmake-build-debug
 toolbox/CMakeFiles
 Xcode
 *.csv
+
+cmake_utils/
+submodules/GenericContainer/
+submodules/UtilsLite/
+submodules/quarticRootsFlocke/
