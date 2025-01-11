@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest, macos-13] # ubuntu-latest,
 
     steps:
       - uses: actions/checkout@v4
@@ -60,14 +60,14 @@ jobs:
         if: matrix.os != 'ubuntu-latest'
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*
           CIBW_ARCHS: native
 
       - name: Build linux wheels
         if: matrix.os == 'ubuntu-latest'
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
-          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-*
+          CIBW_BUILD: cp38-* cp39-* cp310-* cp311-* cp312-* cp313-*
           CIBW_SKIP: "*musllinux*"
           CIBW_ARCHS: x86_64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
