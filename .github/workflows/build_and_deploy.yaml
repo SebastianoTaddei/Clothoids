@@ -72,6 +72,10 @@ jobs:
           CIBW_ARCHS: x86_64
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL_LINUX: >
+            sed -i -e 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Base.repo &&
+            sed -i -e 's/^#baseurl=http:\/\/mirror./baseurl=https:\/\/vault./g' /etc/yum.repos.d/CentOS-Base.repo &&
+            yum clean all &&
+            yum makecache &&
             pip install ninja &&
             yum install -y centos-release-scl &&
             yum install -y rh-ruby34 &&
