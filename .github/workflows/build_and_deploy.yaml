@@ -72,8 +72,8 @@ jobs:
           CIBW_BEFORE_ALL_LINUX: >
             pip install ninja &&
             yum install -y centos-release-scl &&
-            yum install -y rh-ruby34 &&
-            source /opt/rh/rh-ruby34/enable &&
+            yum install -y rh-ruby26 &&
+            source /opt/rh/rh-ruby26/enable &&
             gem install colorize &&
             gem install rubyzip &&
             gem install rake &&
