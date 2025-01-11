@@ -55,3 +55,10 @@ cmake_utils/
 submodules/GenericContainer/
 submodules/UtilsLite/
 submodules/quarticRootsFlocke/
+
+*.egg-info
+*.so
+Clothoids_wrap.cpp
+Clothoids.py
+CMakeLists-Flags.txt
+.cache/
