@@ -1,4 +1,4 @@
-name: Build and run tests
+name: Run tests and publish binaries
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   run_tests:
-    name: Run tests on ${{ matrix.os }}
+    name: Publish binaries on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -49,3 +49,17 @@ jobs:
 
       - name: Run tests
         run: rake test
+
+      - name: Prepare release folder
+        if: github.event_name == 'release' && github.event.action == 'published'
+        run: |
+          mkdir -p release/Clothoids
+          cp -r lib release/Clothoids/
+          cp -r lib3rd release/Clothoids/
+
+      - name: Upload binaries to release
+        if: github.event_name == 'release' && github.event.action == 'published'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/Clothoids/*
+          token: ${{ secrets.GITHUB_TOKEN }}
