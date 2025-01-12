@@ -57,9 +57,16 @@ jobs:
           cp -r lib release/Clothoids/
           cp -r lib3rd release/Clothoids/
 
+      - name: Zip binaries
+        uses: vimtor/action-zip@v1.2
+        if: github.event_name == 'release' && github.event.action == 'published'
+        with:
+          files: release/Clothoids
+          dest: release/Clothoids-${{ github.event.release.tag_name }}-${{ matrix.os }}.zip
+
       - name: Upload binaries to release
         if: github.event_name == 'release' && github.event.action == 'published'
         uses: softprops/action-gh-release@v1
         with:
-          files: release/Clothoids/*
+          files: release/Clothoids-${{ github.event.release.tag_name }}-${{ matrix.os }}.zip
           token: ${{ secrets.GITHUB_TOKEN }}
