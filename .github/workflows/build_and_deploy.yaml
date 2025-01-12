@@ -45,6 +45,7 @@ jobs:
           gem install rake
           ruby setup.rb
 
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Compile Clothoids
         if: matrix.os != 'ubuntu-latest'
         run: |
