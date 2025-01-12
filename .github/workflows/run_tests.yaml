@@ -1,0 +1,51 @@
+name: Build and run tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - stable
+  release:
+    types:
+      - published
+
+jobs:
+  run_tests:
+    name: Run tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-13, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get CMake with Ninja
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: latestrc
+          ninjaVersion: latest
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Setup Ruby
+        run: |
+          gem install colorize
+          gem install rubyzip
+          gem install rake
+          ruby setup.rb
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: matrix.os == 'windows-latest'
+
+      - name: Compile Clothoids
+        run: |
+          rake clean
+          rake
+
+      - name: Run tests
+        run: rake test
