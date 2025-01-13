@@ -12,7 +12,7 @@ on:
 
 jobs:
   run_tests:
-    name: Publish binaries on ${{ matrix.os }}
+    name: Run tests and publish binaries on release for ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
