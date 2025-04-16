@@ -137,6 +137,20 @@ public:
     return theta_D;
   }
 
+  double theta_DD(const double &s)
+  {
+    double theta_DD;
+    theta_DD = this->clothoid_list.theta_DD(s);
+    return theta_DD;
+  }
+
+  double theta_DDD(const double &s)
+  {
+    double theta_DDD;
+    theta_DDD = this->clothoid_list.theta_DDD(s);
+    return theta_DDD;
+  }
+
   std::pair<double, double> findST1(const double &x, const double &y)
   {
     double s, n; // curvilinear abscissa and lateral coordinate
