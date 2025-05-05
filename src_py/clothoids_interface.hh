@@ -105,7 +105,7 @@ public:
     std::vector<double> x, y;
     x.reserve(s.size());
     y.reserve(s.size());
-    for (size_t i{0}; i <= s.size(); i++)
+    for (size_t i{0}; i < s.size(); i++)
     {
       double _x, _y;
       this->clothoid_list.eval(s[i], _x, _y);
