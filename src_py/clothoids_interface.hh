@@ -1,5 +1,4 @@
 #include "Clothoids.hh"
-#include "GenericContainer/GenericContainer.hh"
 #include <array>
 #include <string>
 #include <utility>
@@ -216,6 +215,16 @@ public:
   double theta_DD(double const s) const { return this->clothoid_list.theta_DD(s); }
 
   double theta_DDD(double const s) const { return this->clothoid_list.theta_DDD(s); }
+
+  bool collision(ClothoidList const &cl_list) const
+  {
+    return this->clothoid_list.collision_ISO(0.0, cl_list.clothoid_list, 0.0);
+  }
+
+  bool collision_ISO(double const offs_this_cl, ClothoidList const &cl_list, double const offs_in_cl) const
+  {
+    return this->clothoid_list.collision_ISO(offs_this_cl, cl_list.clothoid_list, offs_in_cl);
+  }
 
   std::pair<double, double> findST1(double const x, double const y) const
   {

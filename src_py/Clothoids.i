@@ -16,6 +16,4 @@
 #include "clothoids_interface.hh"
 %}
 
-%include "GenericContainer.i"
-
 %include "clothoids_interface.hh"
