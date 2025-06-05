@@ -1,5 +1,7 @@
 %module Clothoids
 
+%include "std_string.i"
+
 %include "std_vector.i"
 %template() std::vector<double>;
 
