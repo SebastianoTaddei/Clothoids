@@ -62,3 +62,4 @@ Clothoids_wrap.cpp
 Clothoids.py
 CMakeLists-Flags.txt
 .cache/
+.DS_Store

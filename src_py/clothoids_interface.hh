@@ -63,6 +63,11 @@ public:
     return {kappa_min, kappa_max};
   }
 
+  double kappa(double const s) const
+  {
+    return this->clothoid_curve.kappa(s);
+  }
+
   double theta(double const s) const { return this->clothoid_curve.theta(s); }
 
   double theta_D(double const s) const { return this->clothoid_curve.theta_D(s); }

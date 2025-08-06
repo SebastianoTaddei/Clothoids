@@ -40,9 +40,9 @@ jobs:
 
       - name: Setup Ruby
         run: |
-          gem install colorize
-          gem install rubyzip
-          gem install rake
+          gem install colorize -v 1.1.0
+          gem install rubyzip -v 3.0.0
+          gem install rake -v 13.2.1
           ruby setup.rb
 
       - uses: ilammy/msvc-dev-cmd@v1
@@ -77,9 +77,9 @@ jobs:
             pip install ninja &&
             yum install -y rh-ruby26 &&
             source /opt/rh/rh-ruby26/enable &&
-            gem install colorize &&
-            gem install rubyzip &&
-            gem install rake &&
+            gem install colorize -v 1.1.0 &&
+            gem install rubyzip -v 2.4.1 &&
+            gem install rake -v 13.2.1 &&
             rake clean &&
             rake
 
@@ -107,9 +107,9 @@ jobs:
 
       - name: Setup Ruby
         run: |
-          gem install colorize
-          gem install rubyzip
-          gem install rake
+          gem install colorize -v 1.1.0
+          gem install rubyzip -v 3.0.0
+          gem install rake -v 13.2.1
           ruby setup.rb
 
       - name: Compile Clothoids
