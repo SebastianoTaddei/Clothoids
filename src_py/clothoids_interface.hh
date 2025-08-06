@@ -65,9 +65,7 @@ public:
 
   double kappa(double s) const
   {
-    double kappa;
-    kappa = this->clothoid_curve.kappa(s);
-    return kappa;
+    return this->clothoid_curve.kappa(s);
   }
 
   double theta(double const s) const { return this->clothoid_curve.theta(s); }
