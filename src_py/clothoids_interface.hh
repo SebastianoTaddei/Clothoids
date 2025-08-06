@@ -63,7 +63,7 @@ public:
     return {kappa_min, kappa_max};
   }
 
-  double kappa(double s)
+  double kappa(double s) const
   {
     double kappa;
     kappa = this->clothoid_curve.kappa(s);
